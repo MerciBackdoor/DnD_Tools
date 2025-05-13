@@ -1,0 +1,208 @@
+    @import url('https://fonts.googleapis.com/css2?family=Neucha&display=swap');
+    body {
+      font-family: 'Neucha', cursive;
+      background: linear-gradient(to bottom, #2c3e50, #34495e);
+      color: #ecf0f1;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      letter-spacing: 1px;
+    }
+    #addForm {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #addForm input, #addForm button {
+      font-size: 18px;
+      padding: 8px 12px;
+      margin: 6px;
+      border: none;
+      border-radius: 5px;
+      font-family: 'Neucha', cursive;
+      background: #3b4a59;
+      color: #ecf0f1;
+    }
+    #addForm input::placeholder {
+      color: #999;
+    }
+    #addForm button {
+      background-color: #2980b9;
+      color: white;
+      cursor: pointer;
+    }
+    #controls {
+      text-align: center;
+      margin: 10px 0;
+    }
+    #controls button {
+      font-size: 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0 20px;
+    }
+    #combatants {
+      margin-top: 20px;
+    }
+    .combatant {
+      background: #3b4a59;
+      border: 1px solid #7f8c8d;
+      padding: 8px;
+      margin-bottom: 8px;
+      border-radius: 5px;
+      display: grid;
+      grid-template-columns: 150px 80px 150px 150px 150px 0.8fr 100px;
+      align-items: center;
+      gap: 10px;
+    }
+    .combatant.active {
+      border: 2px solid #ffffff;
+    }
+    .combatant.concentrating {
+      box-shadow: 0 0 10px 2px rgba(52, 152, 219, 0.8);
+    }
+    .hp-control {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .hp-value {
+      min-width: 30px;
+      text-align: center;
+    }
+    .hp-input {
+      width: 50px;
+      background: #2c3e50;
+      color: white;
+      border: 1px solid #7f8c8d;
+      border-radius: 3px;
+      padding: 3px;
+      text-align: center;
+    }
+    .hp-button {
+      padding: 3px 8px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: 'Neucha', cursive;
+    }
+    .damage-btn {
+      background-color: #e74c3c;
+      color: white;
+    }
+    .heal-btn {
+      background-color: #2ecc71;
+      color: white;
+    }
+    .health-bar {
+      background: #555;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      height: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    .health-bar-inner {
+      height: 100%;
+      border-radius: 3px;
+      position: relative;
+    }
+    .health-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      line-height: 30px;
+      font-size: 14px;
+      color: white;
+      text-shadow: 1px 1px 2px black;
+      z-index: 2;
+    }
+    .death-saves-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 10px;
+      z-index: 3;
+    }
+    .death-saves-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .death-save-label {
+      font-size: 12px;
+      margin-right: 3px;
+      text-shadow: 1px 1px 1px black;
+    }
+    .death-save {
+      width: 15px;
+      height: 15px;
+      border: 1px solid white;
+      border-radius: 50%;
+      cursor: pointer;
+      background-color: transparent;
+    }
+    .death-save.success.marked {
+      background-color: #2ecc71;
+      border: 1px solid #27ae60;
+    }
+    .death-save.failure.marked {
+      background-color: #e74c3c;
+      border: 1px solid #c0392b;
+    }
+    .combatant-name {
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ac-value {
+      text-align: center;
+    }
+    .initiative-value {
+      text-align: center;
+    }
+    .concentration-label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+    }
+    .concentration-counter {
+      width: 40px;
+      text-align: center;
+      background: #2c3e50;
+      color: white;
+      border: 1px solid #7f8c8d;
+      border-radius: 3px;
+      padding: 3px;
+    }
+    .dead {
+      background-color: #470000 !important;
+    }
+    .dead .combatant-name {
+      text-decoration: line-through;
+    }
+    .remove-btn {
+      background-color: #c0392b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: 'Neucha', cursive;
+      font-size: 16px;
+    }
+    .remove-btn:hover {
+      background-color: #e74c3c;
+    }

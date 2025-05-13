@@ -1,0 +1,282 @@
+body {
+  margin: 0;
+  font-family: 'Georgia', serif;
+  background: url('https://www.transparenttextures.com/patterns/papyrus.png') repeat;
+  color: #3b2f1d;
+}
+
+/* Убедимся, что контейнер занимает фиксированное пространство */
+.container {
+  display: flex;
+  min-height: 100vh;
+  overflow: hidden; /* Предотвращаем переполнение */
+}
+
+/* Боковая панель с фиксированной шириной */
+.sidebar {
+  flex-shrink: 0; /* Запрещаем сужение боковой панели */
+  width: 300px; /* Фиксированная ширина */
+  background: #f8f2dc;
+  padding: 1em;
+  border-right: 2px solid #bfa774;
+  overflow-y: auto; /* Прокрутка для длинного списка */
+}
+
+/* Список предметов */
+#item-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%; /* Занимает всю доступную ширину */
+  word-wrap: break-word; /* Перенос длинных слов */
+  overflow-y: auto; /* Прокрутка, если список превышает высоту */
+}
+
+/* Элементы списка */
+#item-list li {
+  display: flex; /* Используем flexbox для выравнивания */
+  justify-content: space-between; /* Разделяем текст и кнопки */
+  align-items: center; /* Выравниваем элементы по вертикали */
+  padding: 0.5em;
+  border-bottom: 1px solid #d2c3a5;
+  word-break: break-word; /* Переносим длинные слова */
+  user-select: none; /* Disable text selection */
+}
+
+/* Highlight item row on hover */
+#item-list li:hover {
+  background-color: #f0e6d2; /* Light beige background */
+  cursor: pointer; /* Change cursor to pointer */
+}
+
+/* Ensure the cursor changes to pointer for item name and rarity */
+#item-list li span {
+  cursor: pointer; /* Pointer cursor for text elements */
+}
+
+#item-list li div:first-child {
+  display: flex;
+  flex-direction: column; /* Название и редкость в столбик */
+}
+
+#item-list li button {
+  margin-left: 5px; /* Отступ между кнопками */
+}
+
+#item-list li div:last-child {
+  display: flex; /* Группируем кнопки */
+  gap: 5px; /* Расстояние между кнопками */
+}
+
+/* Основной контент */
+main {
+  flex-grow: 1; /* Занимает оставшееся пространство */
+  padding: 2em;
+  background-color: #fffef5c9;
+  overflow: auto; /* Прокрутка для длинного контента */
+}
+
+form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1em;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+}
+
+textarea, input, select {
+  font-family: inherit;
+  font-size: 1em;
+  padding: 0.5em;
+  background-color: #fef8e6;
+  border: 1px solid #c4a96b;
+  border-radius: 4px;
+}
+
+button {
+  background-color: #d6b370;
+  color: #3b2f1d;
+  font-size: 1.1em;
+  border: none;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+#save-item-button {
+  margin-top: 1em;
+  padding: 0.5em 1em;
+  background-color: #d6b370;
+  color: #3b2f1d;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+#save-item-button:hover {
+  background-color: #c4a96b;
+}
+
+#upload-items-button {
+  background-color: #d6b370;
+  color: #3b2f1d;
+  font-size: 1em;
+  border: none;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-top: 0.5em; /* Add spacing above the button */
+}
+
+#upload-items-button:hover {
+  background-color: #c4a96b;
+}
+
+#item-display {
+  margin-top: 0; /* Убираем верхний отступ */
+  padding: 0.1em 0.5em 0.1em 1em; /* Добавляем отступ слева */
+  background-color: #fff8dc;
+  border: 2px dashed #a38a58;
+  white-space: pre-wrap;
+  text-align: left;
+  line-height: 1; /* Минимальный межстрочный интервал */
+}
+
+#item-display h2 {
+  margin-top: 0; /* Убираем верхний отступ */
+  margin-bottom: 0.05em; /* Минимальный нижний отступ */
+}
+
+#item-display p {
+  margin: 0.05em 0; /* Минимальные отступы между абзацами */
+}
+
+#item-display hr {
+  border: none;
+  border-top: 1px solid #a38a58;
+  margin: 0.05em 0; /* Минимальные отступы вокруг разделителя */
+}
+
+.author {
+  font-size: 0.75em; /* Уменьшаем размер текста */
+  color: #7c6c52;
+  margin-top: 0.1em; /* Минимальный отступ сверху */
+  font-style: italic;
+}
+
+.form-row-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 100%;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+}
+
+.form-row label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.form-row select {
+  min-width: 120px;
+}
+
+#curse-description-label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  margin-top: 1em; /* Добавляем отступ сверху */
+}
+
+#curse-description-label textarea {
+  font-family: inherit;
+  font-size: 1em;
+  padding: 0.5em;
+  background-color: #fef8e6;
+  border: 1px solid #c4a96b;
+  border-radius: 4px;
+}
+
+.small-button {
+  font-size: 0.8em; /* Уменьшаем размер текста */
+  padding: 0.3em 0.6em; /* Уменьшаем отступы */
+  position: absolute; /* Абсолютное позиционирование */
+  right: 1em; /* Отступ от правого края */
+  top: 1.5em; /* Отступ от верхнего края */
+  background-color: #d6b370; /* Цвет фона */
+  color: #3b2f1d; /* Цвет текста */
+  border: none; /* Убираем границу */
+  border-radius: 4px; /* Скругляем углы */
+  cursor: pointer; /* Указатель при наведении */
+}
+
+.small-button:hover {
+  background-color: #c4a96b; /* Цвет при наведении */
+}
+
+/* Rarity styles with text shadow for better visibility */
+.rarity-common {
+  color: #6b6b6b; /* Gray for common */
+  text-shadow: 1px 1px 2px #ffffff; /* Light shadow for contrast */
+}
+
+.rarity-uncommon {
+  color: #1eff4b; /* Blue for uncommon */
+  text-shadow: 1px 1px 2px #000000; /* Dark shadow for better visibility */
+}
+
+.rarity-rare {
+  color: #2b2ee2; /* Purple for rare */
+  text-shadow: 1px 1px 2px #000000; /* Dark shadow for better visibility */
+}
+
+.rarity-very-rare {
+  color: #b300ff; /* Orange for very rare */
+  text-shadow: 1px 1px 2px #000000; /* Dark shadow for better visibility */
+}
+
+.rarity-legendary {
+  color: #ff9500; /* Gold for legendary */
+  text-shadow: 1px 1px 2px #000000; /* Dark shadow for better visibility */
+}
+
+.rarity-artifact {
+  color: #ff0000; /* Red for artifact */
+  text-shadow: 1px 1px 2px #000000; /* Dark shadow for better visibility */
+}
+
+.rarity-variable {
+  color: #346d9c; /* Steel blue for variable rarity */
+  text-shadow: 1px 1px 2px #000000; /* Dark shadow for better visibility */
+}
+
+.rarity-unknown {
+  color: #808080; /* Dark gray for unknown */
+  text-shadow: 1px 1px 2px #ffffff; /* Light shadow for contrast */
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .form-row label {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

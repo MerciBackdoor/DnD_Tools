@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Кузница предметов D&D</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h2>Список предметов</h2>
+      <ul id="item-list"></ul>
+    </aside>
+
+    <main>
+      <h1>Кузница предметов D&D</h1>
+      <button id="clear-form-button" class="small-button" type="button">Очистить</button>
+      <form id="item-form">
+        <label>Название предмета:
+          <input type="text" name="name" required />
+        </label>
+
+  <div class="form-row-container">
+  <div class="form-row">
+    <label>Редкость:
+      <select name="rarity">
+        <option>Обычный</option>
+        <option>Необычный</option>
+        <option>Редкий</option>
+        <option>Очень редкий</option>
+        <option>Легендарный</option>
+        <option>Артефакт</option>
+        <option>Редкость не указана</option>
+        <option>Редкость варьируется</option>
+      </select>
+    </label>
+
+    <label>Тип предмета:
+      <select name="type">
+        <option>Оружие ближнего боя</option>
+        <option>Доспех</option>
+        <option>Волшебная палочка</option>
+        <option>Жезл</option>
+        <option>Посох</option>
+        <option>Зелье</option>
+        <option>Кольцо</option>
+        <option>Свиток</option>
+        <option>Чудесный предмет</option>
+        <option>Оружие дальнего боя</option>
+        <option>Щит</option>
+        <option>Боеприпасы</option>
+        <option>Оружие</option>
+      </select>
+    </label>
+
+    <label>Настройка:
+      <select name="custom">
+        <option>Требуется</option>
+        <option>Не требуется</option>
+      </select>
+    </label>
+
+    <label>Расходуемый:
+      <select name="consumable">
+        <option>Да</option>
+        <option>Нет</option>
+      </select>
+    </label>
+
+    <label>Заряды:
+      <select name="charges">
+        <option>Да</option>
+        <option>Нет</option>
+      </select>
+    </label>
+
+    <label>Проклятие:
+      <select name="curse" id="curse-select">
+        <option>Да</option>
+        <option selected>Нет</option>
+      </select>
+    </label>
+
+
+  </div>
+</div>
+
+        <label>Описание внешнего вида:
+          <textarea name="appearance"></textarea>
+        </label>
+
+        <label>Эффект:
+          <textarea name="effect"></textarea>
+        </label>
+
+        <label id="curse-description-label" style="display: none;">Описание проклятия:
+          <textarea name="curseDescription"></textarea>
+        </label>
+
+        <label>Псевдоним автора:
+          <input type="text" name="author" />
+        </label>
+
+        <label>Загрузить предметы:
+          <input type="file" id="item-loader" accept=".json" multiple />
+        </label>
+        <button id="upload-items-button" type="button">Загрузить</button>
+
+        <button type="submit">Создать предмет</button>
+      </form>
+
+      <div id="item-display">
+        <!-- Здесь отображается информация о предмете -->
+        <button id="save-item-button" style="display: none;">Сохранить</button>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
