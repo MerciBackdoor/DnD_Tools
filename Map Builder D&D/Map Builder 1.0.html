@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Картограф D&D</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Shantell+Sans&display=swap&subset=cyrillic" rel="stylesheet">
+</head>
+<body>
+  <div id="zoom-controls">
+    <button class="zoom-btn" onclick="zoomOut()">-</button>
+    <button class="zoom-btn" onclick="zoomIn()">+</button>
+  </div>
+  <h1 id="title">Картограф D&amp;D</h1>
+  <div id="controls">
+    <div class="controls-row">
+      <label>Ширина (клетки): <input type="number" id="width" min="1" step="1" value="12"></label>
+      <label>Высота (клетки): <input type="number" id="height" min="1" step="1" value="12"></label>
+      <button onclick="createGrid(true)">Создать поле</button>
+      <button onclick="saveGrid()">Сохранить</button>
+      <button onclick="loadGrid()">Загрузить</button>
+      <button id="clear-btn">Очистить поле</button>
+    </div>
+    <div class="controls-row">
+      <label>Поверхность:
+        <select id="surface-tool">
+          <option value="">---</option>
+          <option value="floor">Каменный пол</option>
+          <option value="shaded">Тень</option>
+          <option value="floor-boardwalk">Дощатый пол</option>
+          <option value="floor-water">Вода</option>
+          <option value="floor-lava">Лава</option>
+          <option value="floor-zamlana">Земля</option>
+          <option value="floor-grass">Трава</option>
+        </select>
+      </label>
+      <label>Стены и проёмы:
+        <select id="walls-tool">
+          <option value="">---</option>
+          <option value="wall">Стена</option>
+          <option value="door">Дверь</option>
+          <option value="window">Окно</option>
+        </select>
+      </label>
+      <label>Окружение:
+        <select id="env-tool">
+          <option value="">---</option>
+          <option value="object-chest">Сундук</option>
+          <option value="object-crate">Ящик</option>
+          <option value="object-table">Стол</option>
+          <option value="object-chair">Стул</option>
+          <option value="object-bench">Скамья</option>
+          <option value="object-barrel">Бочка</option>
+          <option value="object-barstool">Барный стул</option>
+          <option value="object-column">Колонна</option>
+          <option value="object-torch-left">Факел (Слева)</option>
+          <option value="object-torch-right">Факел (Справа)</option>
+          <option value="object-torch-top">Факел (Сверху)</option>
+          <option value="object-torch-bottom">Факел (Снизу)</option>
+          <option value="object-tree">Дерево</option>
+          <option value="object-rock">Камень</option>
+        </select>
+      </label>
+      <button id="delete-btn" onclick="toggleRemoveMode()">Удалять</button>
+    </div>
+  </div>
+  <div id="grid-container"></div>
+  <script src="scripts.js"></script>
+</body>
+</html>
