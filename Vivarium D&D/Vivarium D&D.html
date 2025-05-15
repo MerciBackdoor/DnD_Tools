@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>D&D Vivarium</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="sidebar">
+    <h3>Список врагов</h3>
+    <ul id="enemy-list"></ul>
+  </div>
+  <div id="main">
+    <h1>D&D Виварий</h1>
+    <div id="top-buttons">
+      <button type="button" onclick="clearForm()">Очистить</button>
+      <button type="button" onclick="exportData()">Экспорт</button>
+      <input type="file" id="fileInput" accept=".json" onchange="importData(event)">
+    </div>
+    <form id="monster-form">
+      <label>Имя врага:
+        <input type="text" id="name">
+      </label>
+      <label>Краткая характеристика:
+        <input type="text" id="summary">
+      </label>
+      <div class="row-compact">
+        <label>КД:
+          <input type="number" id="ac" min="0" max="99" style="width:70px;">
+        </label>
+        <label>ХП:
+          <input type="number" id="hp" min="0" max="9999" style="width:90px;">
+        </label>
+        <label>Кубы ХП:
+          <input type="text" id="hit_dice" style="width:100px;">
+        </label>
+        <label>Скорость:
+          <input type="number" id="speed" min="0" max="9999" maxlength="4" style="width:70px;" oninput="updateSpeedSuffix(this)">
+          <span id="speed-suffix"> футов</span>
+        </label>
+      </div>
+      <label>Характеристики (Значение):</label>
+      <div class="stat-row">
+        <label>СИЛ: <input type="number" id="str"></label>
+        <label>ЛОВ: <input type="number" id="dex"></label>
+        <label>ТЕЛ: <input type="number" id="con"></label>
+      </div>
+      <div class="stat-row">
+        <label>ИНТ: <input type="number" id="int"></label>
+        <label>МУД: <input type="number" id="wis"></label>
+        <label>ХАР: <input type="number" id="cha"></label>
+      </div>
+      <label>Спасброски:
+        <input type="text" id="saves">
+      </label>
+      <label>Иммунитет к урону:
+        <input type="text" id="immune_damage">
+      </label>
+      <label>Иммунитет к состояниям:
+        <input type="text" id="immune_conditions">
+      </label>
+      <label>Сопротивление урону:
+        <input type="text" id="resistances">
+      </label>
+      <label>Чувства:
+        <input type="text" id="senses">
+      </label>
+      <label>Языки:
+        <input type="text" id="languages">
+      </label>
+      <label>Уровень опасности:
+        <input type="text" id="cr">
+      </label>
+      <label>Бонус мастерства:
+        <input type="number" id="proficiency_bonus">
+      </label>
+      <label>Особые свойства:
+        <textarea id="traits"></textarea>
+      </label>
+      <label>Действия:
+        <textarea id="actions"></textarea>
+      </label>
+      <label>Описание:
+        <textarea id="description"></textarea>
+      </label>
+      <label>Автор:
+        <input type="text" id="author">
+      </label>
+      <button type="button" id="create-btn">Создать</button>
+      <button type="button" id="save-btn">Сохранить</button>
+    </form>
+    <div class="small-text" id="author-output"></div>
+  </div>
+  <script src="scripts.js"></script>
+</body>
+</html>
