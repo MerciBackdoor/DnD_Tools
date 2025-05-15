@@ -18,6 +18,7 @@
       <button type="button" onclick="clearForm()">Очистить</button>
       <button type="button" onclick="exportData()">Экспорт</button>
       <input type="file" id="fileInput" accept=".json" onchange="importData(event)">
+      <label for="fileInput" id="import-btn-label">Импорт</label>
     </div>
     <form id="monster-form">
       <label>Имя врага:
@@ -85,6 +86,15 @@
       <label>Описание:
         <textarea id="description"></textarea>
       </label>
+      <!-- Image upload section -->
+      <div id="image-section" style="margin: 15px 0;">
+        <label>Изображение существа:</label>
+        <input type="file" id="monster-image" accept="image/*" style="display:none;">
+        <button type="button" id="image-upload-btn">Загрузить изображение</button>
+        <button type="button" id="image-delete-btn" style="display:none;">Удалить изображение</button>
+        <div id="image-preview" style="margin-top:10px;"></div>
+        <input type="hidden" id="image">
+      </div>
       <label>Автор:
         <input type="text" id="author">
       </label>

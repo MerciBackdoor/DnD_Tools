@@ -3,7 +3,7 @@ const fields = [
   'str', 'dex', 'con', 'int', 'wis', 'cha',
   'saves', 'immune_damage', 'immune_conditions', 'resistances',
   'senses', 'languages', 'cr', 'proficiency_bonus',
-  'traits', 'actions', 'description', 'author'
+  'traits', 'actions', 'description', 'author', 'image' // <-- added image
 ];
 
 let savedEnemies = JSON.parse(localStorage.getItem('dnd_enemies') || '[]');
@@ -25,9 +25,13 @@ function saveCurrentToStorage() {
 window.onload = () => {
   fields.forEach(id => {
     const el = document.getElementById(id);
+    if (!el) return;
     const saved = localStorage.getItem('dnd_' + id);
     if (saved !== null) el.value = saved;
   });
+  // Load image preview if exists
+  const imgData = localStorage.getItem('dnd_image');
+  if (imgData) showImagePreview(imgData);
   updateAuthor();
   renderEnemyList();
   updateSpeedSuffix(document.getElementById('speed'));
@@ -42,12 +46,57 @@ fields.forEach(id => {
   });
 });
 
+// Image upload logic
+const imageInput = document.getElementById('monster-image');
+const imageUploadBtn = document.getElementById('image-upload-btn');
+const imageDeleteBtn = document.getElementById('image-delete-btn');
+const imagePreview = document.getElementById('image-preview');
+
+imageUploadBtn.onclick = () => imageInput.click();
+
+imageInput.onchange = function() {
+  const file = this.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    document.getElementById('image').value = dataUrl;
+    localStorage.setItem('dnd_image', dataUrl);
+    showImagePreview(dataUrl);
+  };
+  reader.readAsDataURL(file);
+};
+
+imageDeleteBtn.onclick = function() {
+  document.getElementById('image').value = '';
+  localStorage.removeItem('dnd_image');
+  imagePreview.innerHTML = '';
+  imageDeleteBtn.style.display = 'none';
+};
+
+function showImagePreview(dataUrl) {
+  if (dataUrl) {
+    imagePreview.innerHTML = `<img src="${dataUrl}" alt="Изображение существа" style="max-width:180px;max-height:180px;display:block;margin:0 auto 8px auto;border-radius:8px;">`;
+    imageDeleteBtn.style.display = '';
+  } else {
+    imagePreview.innerHTML = '';
+    imageDeleteBtn.style.display = 'none';
+  }
+}
+
+// Update preview if image field changes (e.g. on load)
+document.getElementById('image').addEventListener('input', function() {
+  showImagePreview(this.value);
+});
+
 function clearForm() {
   if (confirm('Вы уверены, что хотите очистить все поля?')) {
     fields.forEach(id => {
-      document.getElementById(id).value = '';
+      const el = document.getElementById(id);
+      if (el) el.value = '';
       localStorage.removeItem('dnd_' + id);
     });
+    showImagePreview('');
     updateAuthor();
     updateSpeedSuffix(document.getElementById('speed'));
   }
@@ -84,9 +133,11 @@ function importData(event) {
       const data = JSON.parse(e.target.result);
       fields.forEach(id => {
         const val = data[id] || '';
-        document.getElementById(id).value = val;
+        const el = document.getElementById(id);
+        if (el) el.value = val;
         localStorage.setItem('dnd_' + id, val);
       });
+      if (data.image) showImagePreview(data.image);
       savedEnemies.push(data);
       localStorage.setItem('dnd_enemies', JSON.stringify(savedEnemies));
       updateAuthor();
@@ -153,9 +204,11 @@ function renderEnemyList() {
 function loadEnemy(enemy) {
   fields.forEach(id => {
     const val = enemy[id] || '';
-    document.getElementById(id).value = val;
+    const el = document.getElementById(id);
+    if (el) el.value = val;
     localStorage.setItem('dnd_' + id, val);
   });
+  showImagePreview(enemy.image || '');
   updateAuthor();
   updateSpeedSuffix(document.getElementById('speed'));
 }
@@ -198,6 +251,7 @@ function viewEnemy(enemy) {
     .author-line { font-size: 0.85em; color: #888; position: absolute; left: 30px; bottom: 18px; }
     .main-content { flex:1; position:relative; }
     body { position: relative; }
+    .monster-image { display:block; margin: 0 auto 16px auto; max-width:220px; max-height:220px; border-radius:10px; box-shadow:0 0 8px #0008; }
   </style>
   </head><body>
   <div class="main-content">`;
@@ -225,6 +279,10 @@ function viewEnemy(enemy) {
   html += `<div class="block"><span class="label">ОСОБЫЕ СВОЙСТВА:</span><br>${formatText(enemy.traits)}</div>`;
   html += `<div class="block"><span class="label">ДЕЙСТВИЯ:</span><br>${formatText(enemy.actions)}</div>`;
   html += `<div class="block desc"><span class="label">ОПИСАНИЕ:</span><br>${formatText(enemy.description) || ''}</div>`;
+  // Insert image here
+  if (enemy.image) {
+    html += `<div class="block"><img src="${enemy.image}" class="monster-image" alt="Изображение существа"></div>`;
+  }
   html += `</div>`;
   html += `<div class="author-line">Автор: ${formatText(enemy.author) || ''}</div>`;
   html += `</body></html>`;
