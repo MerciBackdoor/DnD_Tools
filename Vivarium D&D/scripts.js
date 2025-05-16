@@ -8,10 +8,33 @@ const fields = [
 
 let savedEnemies = JSON.parse(localStorage.getItem('dnd_enemies') || '[]');
 
+function getFieldValue(id) {
+  const el = document.getElementById(id);
+  if (!el) return '';
+  if (el.multiple) {
+    return Array.from(el.selectedOptions).map(opt => opt.value).join(', ');
+  }
+  return el.value;
+}
+
+function setFieldValue(id, value) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (el.multiple) {
+    const values = (value || '').split(',').map(v => v.trim());
+    Array.from(el.options).forEach(opt => {
+      opt.selected = values.includes(opt.value);
+    });
+    updateSelectedDisplay(id); // <-- add this
+  } else {
+    el.value = value || '';
+  }
+}
+
 function saveCurrentToStorage() {
   const enemy = {};
   fields.forEach(id => {
-    const val = document.getElementById(id).value;
+    const val = getFieldValue(id);
     localStorage.setItem('dnd_' + id, val);
     enemy[id] = val;
   });
@@ -27,7 +50,7 @@ window.onload = () => {
     const el = document.getElementById(id);
     if (!el) return;
     const saved = localStorage.getItem('dnd_' + id);
-    if (saved !== null) el.value = saved;
+    if (saved !== null) setFieldValue(id, saved);
   });
   // Load image preview if exists
   const imgData = localStorage.getItem('dnd_image');
@@ -40,7 +63,7 @@ window.onload = () => {
 fields.forEach(id => {
   const el = document.getElementById(id);
   el.addEventListener('input', () => {
-    localStorage.setItem('dnd_' + id, el.value);
+    localStorage.setItem('dnd_' + id, getFieldValue(id));
     if (id === 'author') updateAuthor();
     if (id === 'speed') updateSpeedSuffix(el);
   });
@@ -114,15 +137,6 @@ function updateSpeedSuffix(input) {
   document.getElementById('speed-suffix').textContent = ' футов';
 }
 
-function exportData() {
-  const data = {};
-  fields.forEach(id => {
-    data[id] = document.getElementById(id).value;
-  });
-  downloadEnemy(data);
-  saveCurrentToStorage();
-}
-
 function importData(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -133,8 +147,7 @@ function importData(event) {
       const data = JSON.parse(e.target.result);
       fields.forEach(id => {
         const val = data[id] || '';
-        const el = document.getElementById(id);
-        if (el) el.value = val;
+        setFieldValue(id, val);
         localStorage.setItem('dnd_' + id, val);
       });
       if (data.image) showImagePreview(data.image);
@@ -204,8 +217,7 @@ function renderEnemyList() {
 function loadEnemy(enemy) {
   fields.forEach(id => {
     const val = enemy[id] || '';
-    const el = document.getElementById(id);
-    if (el) el.value = val;
+    setFieldValue(id, val);
     localStorage.setItem('dnd_' + id, val);
   });
   showImagePreview(enemy.image || '');
@@ -232,9 +244,14 @@ function formatText(text) {
   return text.replace(/\n/g, '<br>');
 }
 
+function formatMultiField(field) {
+  if (!field) return '';
+  return field.split(',').map(v => `<span style="display:inline-block;background:#444;color:#e0e0e0;border-radius:2px;padding:2px 8px;margin:2px 2px 2px 0;">${v.trim()}</span>`).join(' ');
+}
+
 // View enemy in a new window
 function viewEnemy(enemy) {
-  const win = window.open('', '_blank', 'width=500,height=700');
+  const win = window.open('', '_blank', 'width=600,height=900');
   let html = `<html><head><title>${enemy.name || 'Враг'}</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond&display=swap" rel="stylesheet">
   <style>
@@ -251,7 +268,9 @@ function viewEnemy(enemy) {
     .author-line { font-size: 0.85em; color: #888; position: absolute; left: 30px; bottom: 18px; }
     .main-content { flex:1; position:relative; }
     body { position: relative; }
-    .monster-image { display:block; margin: 0 auto 16px auto; max-width:220px; max-height:220px; border-radius:10px; box-shadow:0 0 8px #0008; }
+    .monster-image { display:block; margin: 0 auto 16px auto; max-width:350px; max-height:350px; border-radius:10px; box-shadow:0 0 8px #0008; }
+    .multi-field { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .multi-field span { background: #444; color: #e0e0e0; border-radius: 2px; padding: 2px 8px; font-size: 0.98em; }
   </style>
   </head><body>
   <div class="main-content">`;
@@ -259,27 +278,29 @@ function viewEnemy(enemy) {
   html += `<div class="block"><span class="label"></span> ${formatText(enemy.summary) || ''}</div>`;
   html += `<div class="block"><span class="label">КД:</span> <span class="big-num">${enemy.ac || ''}</span> <span class="label">ХП:</span> <span class="big-num">${enemy.hp || ''}</span> <span class="label">Кубики:</span> <span class="big-num">${enemy.hit_dice || ''}</span></div>`;
   html += `<div class="block"><span class="label">Скорость:</span> <span class="big-num">${enemy.speed ? enemy.speed + ' футов' : ''}</span></div>`;
-  html += `<div class="block stat-row">
-    <span><span class="label">СИЛ:</span> <span class="big-num">${enemy.str || ''}</span> <span class="mod">(${getModifier(enemy.str)})</span></span>
-    <span><span class="label">ЛОВ:</span> <span class="big-num">${enemy.dex || ''}</span> <span class="mod">(${getModifier(enemy.dex)})</span></span>
-    <span><span class="label">ТЕЛ:</span> <span class="big-num">${enemy.con || ''}</span> <span class="mod">(${getModifier(enemy.con)})</span></span>
-  </div>`;
-  html += `<div class="block stat-row">
-    <span><span class="label">ИНТ:</span> <span class="big-num">${enemy.int || ''}</span> <span class="mod">(${getModifier(enemy.int)})</span></span>
-    <span><span class="label">МУД:</span> <span class="big-num">${enemy.wis || ''}</span> <span class="mod">(${getModifier(enemy.wis)})</span></span>
-    <span><span class="label">ХАР:</span> <span class="big-num">${enemy.cha || ''}</span> <span class="mod">(${getModifier(enemy.cha)})</span></span>
-  </div>`;
+  // --- STAT TABLE (see next section) ---
+  html += `<div class="block"><table style="width:100%;background:#232326;border-radius:4px;"><tr>
+    <th>СИЛ</th><th>ЛОВ</th><th>ТЕЛ</th><th>ИНТ</th><th>МУД</th><th>ХАР</th></tr>
+    <tr>
+      <td style="text-align:center;">${enemy.str || ''} <span class="mod">(${getModifier(enemy.str)})</span></td>
+      <td style="text-align:center;">${enemy.dex || ''} <span class="mod">(${getModifier(enemy.dex)})</span></td>
+      <td style="text-align:center;">${enemy.con || ''} <span class="mod">(${getModifier(enemy.con)})</span></td>
+      <td style="text-align:center;">${enemy.int || ''} <span class="mod">(${getModifier(enemy.int)})</span></td>
+      <td style="text-align:center;">${enemy.wis || ''} <span class="mod">(${getModifier(enemy.wis)})</span></td>
+      <td style="text-align:center;">${enemy.cha || ''} <span class="mod">(${getModifier(enemy.cha)})</span></td>
+    </tr>
+  </table></div>`;
+  // --- END STAT TABLE ---
   html += `<div class="block"><span class="label">Спасброски:</span> ${formatText(enemy.saves) || ''}</div>`;
-  html += `<div class="block"><span class="label">Иммунитет к урону:</span> ${formatText(enemy.immune_damage) || ''}</div>`;
-  html += `<div class="block"><span class="label">Иммунитет к состояниям:</span> ${formatText(enemy.immune_conditions) || ''}</div>`;
-  html += `<div class="block"><span class="label">Сопротивление урону:</span> ${formatText(enemy.resistances) || ''}</div>`;
+  html += `<div class="block"><span class="label">Иммунитет к урону:</span> <div class="multi-field">${formatMultiField(enemy.immune_damage)}</div></div>`;
+  html += `<div class="block"><span class="label">Иммунитет к состояниям:</span> <div class="multi-field">${formatMultiField(enemy.immune_conditions)}</div></div>`;
+  html += `<div class="block"><span class="label">Сопротивление урону:</span> <div class="multi-field">${formatMultiField(enemy.resistances)}</div></div>`;
   html += `<div class="block"><span class="label">Чувства:</span> ${formatText(enemy.senses) || ''}</div>`;
   html += `<div class="block"><span class="label">Языки:</span> ${formatText(enemy.languages) || ''}</div>`;
   html += `<div class="block"><span class="label">Уровень опасности:</span> ${formatText(enemy.cr) || ''} <span class="label">Бонус мастерства:</span> <span class="big-num">${enemy.proficiency_bonus || ''}</span></div>`;
   html += `<div class="block"><span class="label">ОСОБЫЕ СВОЙСТВА:</span><br>${formatText(enemy.traits)}</div>`;
   html += `<div class="block"><span class="label">ДЕЙСТВИЯ:</span><br>${formatText(enemy.actions)}</div>`;
   html += `<div class="block desc"><span class="label">ОПИСАНИЕ:</span><br>${formatText(enemy.description) || ''}</div>`;
-  // Insert image here
   if (enemy.image) {
     html += `<div class="block"><img src="${enemy.image}" class="monster-image" alt="Изображение существа"></div>`;
   }
@@ -331,19 +352,69 @@ function fallbackDownload(enemy) {
 document.getElementById('create-btn').onclick = function() {
   const data = {};
   fields.forEach(id => {
-    data[id] = document.getElementById(id).value;
+    data[id] = getFieldValue(id);
   });
-  downloadEnemy(data);
+  savedEnemies.push(data); // Сначала добавляем в список
+  localStorage.setItem('dnd_enemies', JSON.stringify(savedEnemies));
+  renderEnemyList();
+  downloadEnemy(data); // Потом сохраняем на диск
+};
+
+// "Обновить" button logic (add to list, no download)
+document.getElementById('update-btn').onclick = function() {
+  const data = {};
+  fields.forEach(id => {
+    data[id] = getFieldValue(id);
+  });
   savedEnemies.push(data);
   localStorage.setItem('dnd_enemies', JSON.stringify(savedEnemies));
   renderEnemyList();
 };
 
-// "Сохранить" button logic
+// "Сохранить" button logic (save to disk, do NOT add to list)
 document.getElementById('save-btn').onclick = function() {
   const data = {};
   fields.forEach(id => {
-    data[id] = document.getElementById(id).value;
+    data[id] = getFieldValue(id);
   });
   downloadEnemy(data);
 };
+
+function updateSelectedDisplay(id) {
+  const select = document.getElementById(id);
+  const display = document.getElementById(id + '_display');
+  if (!select || !display) return;
+  const selected = Array.from(select.selectedOptions).map(opt => `<span>${opt.textContent}</span>`).join('');
+  display.innerHTML = selected || '<span style="color:#888;">Не выбрано</span>';
+}
+
+// Initial update on load
+['immune_damage', 'immune_conditions', 'resistances'].forEach(id => {
+  updateSelectedDisplay(id);
+  document.getElementById(id).addEventListener('change', () => updateSelectedDisplay(id));
+});
+
+['immune_damage', 'immune_conditions', 'resistances'].forEach(id => {
+  const container = document.getElementById(id).closest('.select-container');
+  const display = document.getElementById(id + '_display');
+  // Toggle open on click
+  display.onclick = (e) => {
+    e.stopPropagation();
+    container.classList.toggle('open');
+    if (container.classList.contains('open')) {
+      document.getElementById(id).focus();
+    }
+  };
+});
+
+// Close all selects on outside click
+document.addEventListener('click', function(e) {
+  document.querySelectorAll('.select-container.open').forEach(cont => {
+    cont.classList.remove('open');
+  });
+});
+
+// Prevent closing when clicking inside select
+document.querySelectorAll('.select-container select').forEach(sel => {
+  sel.addEventListener('click', e => e.stopPropagation());
+});

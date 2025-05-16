@@ -175,7 +175,7 @@ ul li span:first-child {
   margin-bottom: 20px;
   justify-content: center;
 }
-#create-btn, #save-btn {
+#create-btn, #save-btn, #update-btn {
   display: block;
   width: 100%;
   margin: 20px 0 0 0;
@@ -188,7 +188,7 @@ ul li span:first-child {
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
-#create-btn:hover, #save-btn:hover {
+#create-btn:hover, #save-btn:hover, #update-btn:hover {
   background: #e74c3c;
   color: #fff;
 }
@@ -257,4 +257,111 @@ input[type="number"]::-webkit-outer-spin-button {
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+}
+#image-preview img {
+  max-width: 350px;
+  max-height: 350px;
+  display: block;
+  margin: 0 auto 8px auto;
+  border-radius: 8px;
+}
+.select-container {
+  position: relative;
+  margin-top: 5px;
+}
+.selected-values {
+  min-height: 32px;
+  background: #232326;
+  border: 1px solid #444;
+  border-radius: 3px;
+  padding: 6px 8px;
+  color: #e0e0e0;
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-size: 1em;
+}
+.selected-values span {
+  background: #444;
+  color: #e0e0e0;
+  border-radius: 2px;
+  padding: 2px 8px;
+  font-size: 0.98em;
+  margin-right: 2px;
+}
+.select-container select {
+  display: none;
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%;
+  min-height: 220px; /* Make the select window bigger */
+  max-height: 320px;
+  z-index: 10;
+  background: #232326;
+  color: #e0e0e0;
+  border: 1px solid #e74c3c;
+  border-radius: 3px;
+  box-shadow: 0 2px 8px #000a;
+  overflow-y: auto;
+}
+.select-container.open select {
+  display: block;
+}
+.select-container select:focus {
+  outline: 2px solid #e74c3c;
+}
+.select-container select option {
+  padding-left: 28px;
+  position: relative;
+}
+.select-container select option:checked {
+  background: #e74c3c;
+  color: #fff;
+}
+.select-container select option::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 1.5px solid #e74c3c;
+  border-radius: 3px;
+  background: #232326;
+}
+.select-container select option:checked::before {
+  content: '✔';
+  color: #fff;
+  background: #e74c3c;
+  border-color: #e74c3c;
+  font-size: 1em;
+  text-align: center;
+  line-height: 18px;
+}
+.stat-table {
+  width: 100%;
+  background: #232326;
+  border-radius: 4px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-collapse: collapse;
+}
+.stat-table th, .stat-table td {
+  text-align: center;
+  padding: 6px 4px;
+  border: 1px solid #444;
+  color: #e0e0e0;
+}
+.stat-table th {
+  background: #232326;
+  font-weight: bold;
+}
+.stat-table input[type="number"] {
+  width: 60px;
+  margin: 0 auto;
+  text-align: center;
 }
