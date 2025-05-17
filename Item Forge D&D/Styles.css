@@ -97,6 +97,10 @@ textarea, input, select {
   border-radius: 4px;
 }
 
+textarea {
+  resize: vertical; /* Only allow vertical resizing */
+}
+
 button {
   background-color: #d6b370;
   color: #3b2f1d;
