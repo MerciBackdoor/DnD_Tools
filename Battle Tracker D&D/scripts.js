@@ -12,7 +12,8 @@ const form = document.getElementById('addForm');
       const name = document.getElementById('name').value;
       const ac = parseInt(document.getElementById('ac').value);
       const maxHp = parseInt(document.getElementById('maxHp').value);
-      const initiative = parseInt(document.getElementById('initiative').value);
+      let initiativeInput = document.getElementById('initiative').value;
+      const initiative = initiativeInput === '' ? 0 : parseInt(initiativeInput);
       const hpInput = document.getElementById('hp').value;
       let hp = hpInput === '' ? maxHp : parseInt(hpInput);
       hp = Math.min(hp, maxHp);
@@ -148,6 +149,25 @@ const form = document.getElementById('addForm');
       renderCombatants();
     }
 
+    function copyCombatant(index) {
+      const original = combatants[index];
+      // Find all combatants with the same base name
+      const baseName = original.name.replace(/\s\d+$/, '');
+      const sameBase = combatants.filter(c => c.name.startsWith(baseName));
+      // Find the next available number
+      let maxNum = 0;
+      sameBase.forEach(c => {
+        const match = c.name.match(/\s(\d+)$/);
+        if (match) maxNum = Math.max(maxNum, parseInt(match[1]));
+      });
+      const newName = `${baseName} ${maxNum + 1}`;
+      const copy = JSON.parse(JSON.stringify(original));
+      copy.name = newName;
+      combatants.splice(index + 1, 0, copy);
+      renderCombatants();
+      saveCombatants();
+    }
+
     function renderCombatants() {
       combatantsDiv.innerHTML = '';
       if (combatants.length === 0) {
@@ -185,8 +205,8 @@ const form = document.getElementById('addForm');
           <div class="combatant-name">${c.name}</div>
           <div class="ac-value">КД: ${c.ac}</div>
           <div class="hp-control">
-            <input type="number" class="hp-input" placeholder="0" min="0">
             <button class="hp-button damage-btn" onclick="applyHpChange(${index}, 'damage')">Урон</button>
+            <input type="number" class="hp-input" placeholder="0" min="0">
             <button class="hp-button heal-btn" onclick="applyHpChange(${index}, 'heal')">Лечение</button>
           </div>
           <div class="initiative-value">
@@ -204,6 +224,7 @@ const form = document.getElementById('addForm');
             ${deathSavesHTML}
           </div>
           <button class="remove-btn" onclick="removeCombatant(${index})">Удалить</button>
+          <button class="copy-btn" onclick="copyCombatant(${index})">Копировать</button>
         `;
         combatantsDiv.appendChild(div);
       });
@@ -219,6 +240,7 @@ const form = document.getElementById('addForm');
     window.updateInitiative = updateInitiative;
     window.toggleConcentration = toggleConcentration;
     window.updateConcentrationCounter = updateConcentrationCounter;
+    window.copyCombatant = copyCombatant;
 
     // Импорт данных
 document.getElementById('importFile').addEventListener('change', function (e) {
@@ -229,13 +251,37 @@ document.getElementById('importFile').addEventListener('change', function (e) {
     try {
       const data = JSON.parse(event.target.result);
       if (Array.isArray(data)) {
-        combatants = data;
-        currentTurnIndex = 0;
+        combatants = combatants.concat(data); // <-- Now it ADDS!
         renderCombatants();
         saveCombatants();
       }
     } catch (err) {
       alert('Ошибка при импорте данных: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById('load-btn').addEventListener('click', function () {
+  const fileInput = document.getElementById('importFile');
+  const file = fileInput.files[0];
+  if (!file) {
+    alert('Выберите файл для загрузки!');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function (event) {
+    try {
+      const data = JSON.parse(event.target.result);
+      if (Array.isArray(data)) {
+        combatants = combatants.concat(data);
+        renderCombatants();
+        saveCombatants();
+      } else {
+        alert('Файл должен содержать массив врагов.');
+      }
+    } catch (err) {
+      alert('Ошибка при загрузке: ' + err.message);
     }
   };
   reader.readAsText(file);

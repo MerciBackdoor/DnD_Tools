@@ -52,9 +52,8 @@ window.onload = () => {
     const saved = localStorage.getItem('dnd_' + id);
     if (saved !== null) setFieldValue(id, saved);
   });
-  // Load image preview if exists
-  const imgData = localStorage.getItem('dnd_image');
-  if (imgData) showImagePreview(imgData);
+  // Показываем предпросмотр только из поля #image
+  showImagePreview(imageHidden.value);
   updateAuthor();
   renderEnemyList();
   updateSpeedSuffix(document.getElementById('speed'));
@@ -74,32 +73,64 @@ const imageInput = document.getElementById('monster-image');
 const imageUploadBtn = document.getElementById('image-upload-btn');
 const imageDeleteBtn = document.getElementById('image-delete-btn');
 const imagePreview = document.getElementById('image-preview');
+const imageHidden = document.getElementById('image');
 
 imageUploadBtn.onclick = () => imageInput.click();
 
 imageInput.onchange = function() {
   const file = this.files[0];
   if (!file) return;
+  // (опционально) Можно добавить ограничение на исходный размер файла, например 2 МБ
+  if (file.size > 2 * 1024 * 1024) {
+    alert('Изображение слишком большое (максимум 2 МБ).');
+    return;
+  }
   const reader = new FileReader();
   reader.onload = function(e) {
-    const dataUrl = e.target.result;
-    document.getElementById('image').value = dataUrl;
-    localStorage.setItem('dnd_image', dataUrl);
-    showImagePreview(dataUrl);
+    const img = new Image();
+    img.onload = function() {
+      // Ограничиваем размер 500x500, сохраняя пропорции
+      const maxSize = 500;
+      let w = img.width;
+      let h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) {
+          h = Math.round(h * (maxSize / w));
+          w = maxSize;
+        } else {
+          w = Math.round(w * (maxSize / h));
+          h = maxSize;
+        }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      // Сохраняем как JPEG с качеством 0.6 (60%)
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+      // (опционально) Проверяем итоговый размер base64-строки
+      if (dataUrl.length > 2000000) { // ~2MB base64 string
+        alert('Изображение после сжатия всё равно слишком большое! Попробуйте другую картинку.');
+        return;
+      }
+      imageHidden.value = dataUrl;
+      showImagePreview(dataUrl);
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 };
 
 imageDeleteBtn.onclick = function() {
-  document.getElementById('image').value = '';
+  imageHidden.value = '';
   localStorage.removeItem('dnd_image');
-  imagePreview.innerHTML = '';
-  imageDeleteBtn.style.display = 'none';
+  showImagePreview('');
 };
 
 function showImagePreview(dataUrl) {
   if (dataUrl) {
-    imagePreview.innerHTML = `<img src="${dataUrl}" alt="Изображение существа" style="max-width:180px;max-height:180px;display:block;margin:0 auto 8px auto;border-radius:8px;">`;
+    imagePreview.innerHTML = `<img src="${dataUrl}" alt="Изображение существа" style="max-width:600px;max-height:600px;display:block;margin:0 auto 8px auto;border-radius:8px;">`;
     imageDeleteBtn.style.display = '';
   } else {
     imagePreview.innerHTML = '';
@@ -107,8 +138,8 @@ function showImagePreview(dataUrl) {
   }
 }
 
-// Update preview if image field changes (e.g. on load)
-document.getElementById('image').addEventListener('input', function() {
+// Следим за изменением скрытого поля и обновляем предпросмотр
+imageHidden.addEventListener('input', function() {
   showImagePreview(this.value);
 });
 
@@ -116,10 +147,22 @@ function clearForm() {
   if (confirm('Вы уверены, что хотите очистить все поля?')) {
     fields.forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.value = '';
+      if (!el) return;
+      if (el.type === 'hidden') {
+        el.value = '';
+      } else if (el.multiple) {
+        Array.from(el.options).forEach(opt => opt.selected = false);
+        updateSelectedDisplay(id);
+      } else {
+        el.value = '';
+      }
       localStorage.removeItem('dnd_' + id);
     });
+    // Явно очищаем предпросмотр и скрытое поле изображения
+    imageHidden.value = '';
     showImagePreview('');
+    // Сбросить отображение выбранных значений для select
+    ['immune_damage', 'immune_conditions', 'resistances'].forEach(id => updateSelectedDisplay(id));
     updateAuthor();
     updateSpeedSuffix(document.getElementById('speed'));
   }
@@ -145,17 +188,11 @@ function importData(event) {
   reader.onload = function(e) {
     try {
       const data = JSON.parse(e.target.result);
-      fields.forEach(id => {
-        const val = data[id] || '';
-        setFieldValue(id, val);
-        localStorage.setItem('dnd_' + id, val);
-      });
-      if (data.image) showImagePreview(data.image);
+      // Просто добавляем врага в список, не заполняя форму
       savedEnemies.push(data);
       localStorage.setItem('dnd_enemies', JSON.stringify(savedEnemies));
-      updateAuthor();
       renderEnemyList();
-      updateSpeedSuffix(document.getElementById('speed'));
+      // Не трогаем форму, предпросмотр, автора и скорость
     } catch (err) {
       alert('Ошибка загрузки файла');
     }
@@ -220,7 +257,9 @@ function loadEnemy(enemy) {
     setFieldValue(id, val);
     localStorage.setItem('dnd_' + id, val);
   });
+  // Синхронизируем предпросмотр с новым значением поля #image
   showImagePreview(enemy.image || '');
+  imageHidden.value = enemy.image || '';
   updateAuthor();
   updateSpeedSuffix(document.getElementById('speed'));
 }
@@ -253,7 +292,7 @@ function formatMultiField(field) {
 
 // View enemy in a new window
 function viewEnemy(enemy) {
-  const win = window.open('', '_blank', 'width=600,height=900');
+  const win = window.open('', '_blank', 'width=700,height=900');
   let html = `<html><head><title>${enemy.name || 'Враг'}</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond&display=swap" rel="stylesheet">
   <style>
@@ -270,7 +309,7 @@ function viewEnemy(enemy) {
     .author-line { font-size: 0.85em; color: #888; position: absolute; left: 30px; bottom: 18px; }
     .main-content { flex:1; position:relative; }
     body { position: relative; }
-    .monster-image { display:block; margin: 0 auto 16px auto; max-width:350px; max-height:350px; border-radius:10px; box-shadow:0 0 8px #0008; }
+    .monster-image { display:block; margin: 0 auto 16px auto; max-width:600px; max-height:600px; border-radius:10px; box-shadow:0 0 8px #0008; }
     .multi-field { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
     .multi-field span { background: #444; color: #e0e0e0; border-radius: 2px; padding: 2px 8px; font-size: 0.98em; }
   </style>
@@ -356,10 +395,11 @@ document.getElementById('create-btn').onclick = function() {
   fields.forEach(id => {
     data[id] = getFieldValue(id);
   });
-  savedEnemies.push(data); // Сначала добавляем в список
+  savedEnemies.push(data); // Просто добавляем, не проверяя имя
   localStorage.setItem('dnd_enemies', JSON.stringify(savedEnemies));
   renderEnemyList();
-  downloadEnemy(data); // Потом сохраняем на диск
+  downloadEnemy(data);
+  // clearForm(); // Больше не очищаем форму после создания
 };
 
 // "Обновить" button logic (add to list, no download)
@@ -368,9 +408,10 @@ document.getElementById('update-btn').onclick = function() {
   fields.forEach(id => {
     data[id] = getFieldValue(id);
   });
-  savedEnemies.push(data);
+  savedEnemies.push(data); // Просто добавляем, не проверяя имя
   localStorage.setItem('dnd_enemies', JSON.stringify(savedEnemies));
   renderEnemyList();
+  // clearForm(); // Больше не очищаем форму после обновления
 };
 
 // "Сохранить" button logic (save to disk, do NOT add to list)
@@ -380,6 +421,7 @@ document.getElementById('save-btn').onclick = function() {
     data[id] = getFieldValue(id);
   });
   downloadEnemy(data);
+  // clearForm(); // Больше не очищаем форму после сохранения
 };
 
 function updateSelectedDisplay(id) {

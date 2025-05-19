@@ -1,6 +1,6 @@
-    @import url('https://fonts.googleapis.com/css2?family=Neucha&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Neucha&display=swap');
     body {
-      font-family: 'Neucha', cursive;
+      font-family: 'Cormorant Garamond', serif;
       background: linear-gradient(to bottom, #2c3e50, #34495e);
       color: #ecf0f1;
       margin: 0;
@@ -15,13 +15,16 @@
       text-align: center;
       margin-bottom: 20px;
     }
-    #addForm input, #addForm button {
+    #addForm input, #addForm button,
+    #export-btn, #load-btn,
+    #importFile, .combatant, .remove-btn, .copy-btn,
+    .hp-button, .concentration-label, .concentration-counter {
+      font-family: 'Cormorant Garamond', serif !important;
       font-size: 18px;
       padding: 8px 12px;
       margin: 6px;
       border: none;
       border-radius: 5px;
-      font-family: 'Neucha', cursive;
       background: #3b4a59;
       color: #ecf0f1;
     }
@@ -50,13 +53,15 @@
     .combatant {
       background: #3b4a59;
       border: 1px solid #7f8c8d;
-      padding: 8px;
-      margin-bottom: 8px;
+      padding: 4px 6px; /* reduced from 8px */
+      margin-bottom: 6px; /* reduced from 8px */
       border-radius: 5px;
       display: grid;
-      grid-template-columns: 150px 80px 150px 150px 150px 0.8fr 100px;
+      grid-template-columns: 170px 70px 210px 170px 210px 1.5fr 110px 110px;
       align-items: center;
-      gap: 10px;
+      gap: 8px; /* reduced from 10px */
+      position: relative;
+      min-height: 38px; /* add a minimum height if needed */
     }
     .combatant.active {
       border: 2px solid #ffffff;
@@ -67,7 +72,7 @@
     .hp-control {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 3px; /* reduced from 5px */
     }
     .hp-value {
       min-width: 30px;
@@ -79,8 +84,9 @@
       color: white;
       border: 1px solid #7f8c8d;
       border-radius: 3px;
-      padding: 3px;
+      padding: 2px 4px;
       text-align: center;
+      height: 22px;
     }
     .hp-button {
       padding: 3px 8px;
@@ -101,9 +107,12 @@
       background: #555;
       border: 1px solid #ccc;
       border-radius: 3px;
-      height: 30px;
+      height: 22px; /* reduced from 30px */
       position: relative;
       overflow: hidden;
+      min-width: 180px; /* slightly smaller */
+      max-width: 300px;
+      margin: 0 6px;
     }
     .health-bar-inner {
       height: 100%;
@@ -116,8 +125,8 @@
       left: 0;
       right: 0;
       text-align: center;
-      line-height: 30px;
-      font-size: 14px;
+      line-height: 22px; /* match new health bar height */
+      font-size: 13px;
       color: white;
       text-shadow: 1px 1px 2px black;
       z-index: 2;
@@ -131,7 +140,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 10px;
+      padding: 0 4px;
       z-index: 3;
     }
     .death-saves-group {
@@ -165,6 +174,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      font-size: 1em;
     }
     .ac-value {
       text-align: center;
@@ -185,7 +195,9 @@
       color: white;
       border: 1px solid #7f8c8d;
       border-radius: 3px;
-      padding: 3px;
+      padding: 2px 4px;
+      font-size: 15px;
+      height: 22px;
     }
     .dead {
       background-color: #470000 !important;
@@ -198,11 +210,65 @@
       color: white;
       border: none;
       border-radius: 5px;
-      padding: 5px 10px;
+      padding: 3px 8px;
       cursor: pointer;
       font-family: 'Neucha', cursive;
-      font-size: 16px;
+      font-size: 15px;
     }
     .remove-btn:hover {
       background-color: #e74c3c;
+    }
+    .copy-btn {
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 3px 8px;
+      cursor: pointer;
+      font-family: 'Neucha', cursive;
+      font-size: 15px;
+      margin-left: 8px;
+    }
+    .copy-btn:hover {
+      background-color: #3498db;
+    }
+    #export-btn, #load-btn {
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 18px;
+      font-size: 18px;
+      font-family: 'Neucha', cursive;
+      cursor: pointer;
+      margin-left: 8px;
+      margin-right: 8px;
+      transition: background 0.2s;
+    }
+    #export-btn:hover, #load-btn:hover {
+      background-color: #3498db;
+    }
+    #importFile {
+      font-family: 'Neucha', cursive;
+      background: #3b4a59;
+      color: #ecf0f1;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 12px;
+      font-size: 18px;
+      margin-right: 8px;
+    }
+    #importFile::file-selector-button {
+      background: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 6px 14px;
+      font-family: 'Neucha', cursive;
+      font-size: 16px;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+    #importFile::file-selector-button:hover {
+      background: #3498db;
     }

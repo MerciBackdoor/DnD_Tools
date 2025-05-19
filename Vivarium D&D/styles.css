@@ -258,9 +258,10 @@ input[type="number"]::-webkit-outer-spin-button {
   justify-content: center;
   box-sizing: border-box;
 }
-#image-preview img {
-  max-width: 350px;
-  max-height: 350px;
+#image-preview img,
+.monster-image {
+  max-width: 750px;
+  max-height: 750px;
   display: block;
   margin: 0 auto 8px auto;
   border-radius: 8px;
