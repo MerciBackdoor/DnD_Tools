@@ -2,6 +2,7 @@ const fields = [
   'name', 'summary', 'ac', 'hp', 'hit_dice', 'speed',
   'str', 'dex', 'con', 'int', 'wis', 'cha',
   'saves', 'immune_damage', 'immune_conditions', 'resistances',
+  'vulnerabilities', // <-- add here
   'senses', 'languages', 'cr', 'proficiency_bonus',
   'traits', 'actions', 'description', 'author', 'image' // <-- added image
 ];
@@ -336,6 +337,7 @@ function viewEnemy(enemy) {
   html += `<div class="block"><span class="label">Иммунитет к урону:</span> <div class="multi-field">${formatMultiField(enemy.immune_damage)}</div></div>`;
   html += `<div class="block"><span class="label">Иммунитет к состояниям:</span> <div class="multi-field">${formatMultiField(enemy.immune_conditions)}</div></div>`;
   html += `<div class="block"><span class="label">Сопротивление урону:</span> <div class="multi-field">${formatMultiField(enemy.resistances)}</div></div>`;
+  html += `<div class="block"><span class="label">Уязвимость к урону:</span> <div class="multi-field">${formatMultiField(enemy.vulnerabilities)}</div></div>`;
   html += `<div class="block"><span class="label">Чувства:</span> ${formatText(enemy.senses) || ''}</div>`;
   html += `<div class="block"><span class="label">Языки:</span> ${formatText(enemy.languages) || ''}</div>`;
   html += `<div class="block"><span class="label">Уровень опасности:</span> ${formatText(enemy.cr) || ''} <span class="label">Бонус мастерства:</span> <span class="big-num">${enemy.proficiency_bonus || ''}</span></div>`;
@@ -433,15 +435,14 @@ function updateSelectedDisplay(id) {
 }
 
 // Initial update on load
-['immune_damage', 'immune_conditions', 'resistances'].forEach(id => {
+['immune_damage', 'immune_conditions', 'resistances', 'vulnerabilities'].forEach(id => {
   updateSelectedDisplay(id);
   document.getElementById(id).addEventListener('change', () => updateSelectedDisplay(id));
 });
 
-['immune_damage', 'immune_conditions', 'resistances'].forEach(id => {
+['immune_damage', 'immune_conditions', 'resistances', 'vulnerabilities'].forEach(id => {
   const container = document.getElementById(id).closest('.select-container');
   const display = document.getElementById(id + '_display');
-  // Toggle open on click
   display.onclick = (e) => {
     e.stopPropagation();
     container.classList.toggle('open');

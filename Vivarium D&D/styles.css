@@ -57,6 +57,7 @@ label {
   margin-top: 10px;
   font-weight: bold;
   color: #e0e0e0;
+  font-family: 'Cormorant Garamond', serif;
 }
 textarea, input[type="text"], input[type="number"] {
   width: 100%;
@@ -88,6 +89,7 @@ button {
   font-size: 1em;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
+  font-family: 'Cormorant Garamond', serif;
 }
 button:hover {
   background: #e74c3c;
