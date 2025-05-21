@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Поле с юнитами</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h3>Создание поля</h3>
+    <form id="setupForm" class="inline-form">
+      <label>Ширина:
+        <input type="number" id="width" value="10" min="1" max="999" maxlength="3" />
+      </label>
+      <label>Высота:
+        <input type="number" id="height" value="10" min="1" max="999" maxlength="3" />
+      </label>
+      <button>Создать</button>
+
+      <!-- Новая кнопка очистки -->
+      <button type="button" id="clearBtn" style="background:#7a1a1a; margin-left: 12px;">Очистить поле</button>
+    </form>
+
+    <h3>Добавление юнита</h3>
+    <form id="unitForm" class="inline-form">
+      <label>Имя:
+        <input type="text" id="unitName" required />
+      </label>
+      <label>Цвет:
+        <input type="color" id="unitColor" value="#ff0000" />
+      </label>
+      <label>Размер:
+        <select id="unitSize">
+          <option value="1">1x1</option>
+          <option value="2">2x2</option>
+          <option value="3">3x3</option>
+          <option value="4">4x4</option>
+        </select>
+      </label>
+      <label>X:
+        <input type="number" id="unitX" value="0" min="0" />
+      </label>
+      <label>Y:
+        <input type="number" id="unitY" value="0" min="0" />
+      </label>
+      <button>Добавить</button>
+    </form>
+
+    <button id="deleteBtn">Удаление</button>
+
+    <div id="field"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
