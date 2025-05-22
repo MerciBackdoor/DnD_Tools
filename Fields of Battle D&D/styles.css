@@ -89,7 +89,6 @@ body {
   color: #ffe8e8;
 }
 
-/* Формы в одну строку, аккуратно */
 .inline-form {
   display: flex;
   flex-wrap: wrap;
@@ -139,7 +138,6 @@ body {
   background: #b2891f;
 }
 
-/* Ограничения для input number по ширине */
 input[type="number"]::-webkit-inner-spin-button, 
 input[type="number"]::-webkit-outer-spin-button { 
   -webkit-appearance: none; 
@@ -149,7 +147,6 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-/* Для мобилок, если нужно */
 @media (max-width: 650px) {
   .inline-form {
     flex-direction: column;
