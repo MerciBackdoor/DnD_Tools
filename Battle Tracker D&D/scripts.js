@@ -86,6 +86,14 @@ const form = document.getElementById('addForm');
       renderCombatants();
     }
 
+    function updateAC(index, value) {
+      const val = parseInt(value);
+      if (!isNaN(val) && val >= 0) {
+        combatants[index].ac = val;
+        renderCombatants();
+      }
+    }
+
     function updateInitiative(index, value) {
       const val = parseInt(value);
       if (!isNaN(val)) {
@@ -203,7 +211,9 @@ const form = document.getElementById('addForm');
 
         div.innerHTML = `
           <div class="combatant-name">${c.name}</div>
-          <div class="ac-value">КД: ${c.ac}</div>
+          <div class="ac-value">
+            КД: <input type="number" class="ac-input" value="${c.ac}" onchange="updateAC(${index}, this.value)">
+          </div>
           <div class="hp-control">
             <button class="hp-button damage-btn" onclick="applyHpChange(${index}, 'damage')">Урон</button>
             <input type="number" class="hp-input" placeholder="0" min="0">
@@ -237,6 +247,7 @@ const form = document.getElementById('addForm');
     window.nextTurn = nextTurn;
     window.prevTurn = prevTurn;
     window.addCombatant = addCombatant;
+    window.updateAC = updateAC;
     window.updateInitiative = updateInitiative;
     window.toggleConcentration = toggleConcentration;
     window.updateConcentrationCounter = updateConcentrationCounter;
@@ -325,6 +336,12 @@ addCombatant = function () {
 const originalApplyHpChange = applyHpChange;
 applyHpChange = function (index, type) {
   originalApplyHpChange(index, type);
+  saveCombatants();
+};
+
+const originalUpdateAC = updateAC;
+updateAC = function (index, value) {
+  originalUpdateAC(index, value);
   saveCombatants();
 };
 
