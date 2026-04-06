@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Neucha&display=swap');
+
+body {
+  font-family: 'Cormorant Garamond', serif;
+  background: linear-gradient(to bottom, #2c3e50, #34495e);
+  color: #ecf0f1;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 { text-align: center; font-size: 2.5em; margin-bottom: 20px; }
+
+.combatant-main-row {
+  display: grid;
+  grid-template-columns: 40px 1.2fr 80px 160px 80px 80px 1.8fr 150px;
+  align-items: center; gap: 12px;
+}
+
+.combatant {
+  background: #3b4a59; border: 1px solid #7f8c8d;
+  margin-bottom: 8px; border-radius: 8px; padding: 8px 12px;
+  transition: all 0.2s ease;
+}
+
+.combatant.collapsed { padding: 4px 12px; background: #2c3e50; min-height: 30px; }
+.combatant.collapsed .hide-on-collapse { display: none; }
+.combatant.active { border: 2px solid #f1c40f; }
+.combatant.dead { background-color: #470000 !important; }
+
+/* Кнопки и поля AddForm стали выше на 50% (увеличен padding) */
+#addForm input, #addForm button {
+  padding: 10px 15px; 
+  font-size: 1.1em;
+}
+
+/* Кнопки без фона (включая Загрузить/Сохранить) */
+.icon-btn, #controls button, .hp-control button, .file-ops button {
+  background: none; border: none; color: #ecf0f1;
+  cursor: pointer; font-size: 18px; padding: 5px; transition: transform 0.1s;
+}
+
+#controls button { font-size: 32px; }
+#controls button:active, .hp-control button:active { transform: scale(0.9); }
+
+.notes-area { margin: 10px auto 0; width: 95%; display: none; }
+.combatant.notes-open .notes-area { display: block; }
+.notes-area textarea {
+  width: 100%; background: #1a252f; color: #bdc3c7;
+  border: 1px solid #7f8c8d; border-radius: 5px; padding: 8px; font-family: 'Neucha', cursive;
+}
+
+.actions { display: flex; gap: 8px; margin-left: 20%; justify-content: flex-end; }
+
+.health-bar {
+  background: #444; height: 22px; border-radius: 11px;
+  position: relative; overflow: hidden; border: 1px solid #7f8c8d;
+}
+.health-bar-inner { height: 100%; transition: width 0.3s; }
+.health-text {
+  position: absolute; width: 100%; text-align: center;
+  line-height: 22px; font-size: 12px; font-weight: bold; z-index: 2;
+  text-shadow: 1px 1px 2px black;
+}
+
+.death-saves-row {
+  display: flex; justify-content: center; align-items: center; gap: 15px;
+  margin-top: 10px; padding: 5px; background: rgba(0,0,0,0.2); border-radius: 5px;
+}
+.death-save-group { display: flex; gap: 5px; align-items: center; }
+.death-dot { width: 15px; height: 15px; border: 2px solid #fff; border-radius: 50%; cursor: pointer; }
+.death-dot.success.active { background: #2ecc71; border-color: #2ecc71; }
+.death-dot.failure.active { background: #e74c3c; border-color: #e74c3c; }
+
+.remove-btn { color: #e74c3c !important; }
+.top-controls { text-align: center; margin-bottom: 20px; }
+#addForm { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+#controls { text-align: center; margin-bottom: 20px; }
+input { background: #2c3e50; border: 1px solid #7f8c8d; color: white; border-radius: 4px; padding: 2px; text-align: center; }
