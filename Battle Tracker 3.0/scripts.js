@@ -198,20 +198,54 @@ window.handleDeathSave = (index, type, step) => {
 };
 window.nextTurn = () => { 
     if(!combatants.length) return;
-    currentTurnIndex = (currentTurnIndex + 1) % combatants.length;
+
+    // Ищем следующий индекс персонажа, который не свёрнут
+    let nextIndex = (currentTurnIndex + 1) % combatants.length;
+    let attempts = 0;
+    
+    // Цикл пропускает всех свёрнутых, пока не найдёт активного или не проверит всех
+    while (combatants[nextIndex].isCollapsed && attempts < combatants.length) {
+        nextIndex = (nextIndex + 1) % combatants.length;
+        attempts++;
+    }
+
+    // Если все свёрнуты, индекс не поменяется, иначе переходим на найденного
+    if (!combatants[nextIndex].isCollapsed) {
+        currentTurnIndex = nextIndex;
+    }
+
+    // Снижаем концентрацию только у тех, кто НЕ свёрнут
     combatants.forEach(c => { 
-        if(c.concentration && c.concentrationCounter > 0) {
+        if(!c.isCollapsed && c.concentration && c.concentrationCounter > 0) {
             c.concentrationCounter--;
             if(c.concentrationCounter === 0) c.concentration = false;
         }
     });
+    
     sortAndRender(); 
 };
 
 window.prevTurn = () => { 
     if(!combatants.length) return;
-    currentTurnIndex = (currentTurnIndex - 1 + combatants.length) % combatants.length;
-    combatants.forEach(c => { if(c.concentration) c.concentrationCounter++; });
+
+    // Ищем предыдущий индекс, пропуская свёрнутых
+    let prevIndex = (currentTurnIndex - 1 + combatants.length) % combatants.length;
+    let attempts = 0;
+
+    while (combatants[prevIndex].isCollapsed && attempts < combatants.length) {
+        prevIndex = (prevIndex - 1 + combatants.length) % combatants.length;
+        attempts++;
+    }
+
+    if (!combatants[prevIndex].isCollapsed) {
+        currentTurnIndex = prevIndex;
+    }
+
+    // Увеличиваем концентрацию обратно только у активных
+    combatants.forEach(c => { 
+        if(!c.isCollapsed && c.concentration) c.concentrationCounter++; 
+    });
+    
     render(); 
 };
 
