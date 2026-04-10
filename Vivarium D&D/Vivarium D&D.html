@@ -24,7 +24,51 @@
         <input type="text" id="name">
       </label>
       <label>Краткая характеристика:
-        <input type="text" id="summary">
+        <div class="row-compact">
+  <label>Размер:
+    <select id="size">
+      <option value="Крошечный">Крошечный</option>
+      <option value="Маленький">Маленький</option>
+      <option value="Средний" selected>Средний</option>
+      <option value="Большой">Большой</option>
+      <option value="Огромный">Огромный</option>
+      <option value="Громадный">Громадный</option>
+    </select>
+  </label>
+  <label>Тип:
+    <select id="type">
+      <option value="Аберрация">Аберрация</option>
+      <option value="Зверь">Зверь</option>
+      <option value="Небожитель">Небожитель</option>
+      <option value="Конструкт">Конструкт</option>
+      <option value="Дракон">Дракон</option>
+      <option value="Элементаль">Элементаль</option>
+      <option value="Фея">Фея</option>
+      <option value="Исчадие">Исчадие</option>
+      <option value="Великан">Великан</option>
+      <option value="Гуманоид" selected>Гуманоид</option>
+      <option value="Монстр">Монстр</option>
+      <option value="Растение">Растение</option>
+      <option value="Нежить">Нежить</option>
+      <option value="Слизь">Слизь</option>
+      <option value="Стая крошечных зверей">Стая крошечных зверей</option>
+    </select>
+  </label>
+  <label>Мировоззрение:
+    <select id="alignment">
+      <option value="Без Мировоззрения">Без Мировоззрения</option>
+      <option value="Различное Мировоззрение">Различное Мировоззрение</option>
+      <option value="Законно-добрый">Законно-добрый</option>
+      <option value="Нейтрально-добрый">Нейтрально-добрый</option>
+      <option value="Хаотично-добрый">Хаотично-добрый</option>
+      <option value="Законно-нейтральный">Законно-нейтральный</option>
+      <option value="Истинно нейтральный" selected>Истинно нейтральный</option>
+      <option value="Хаотично-нейтральный">Хаотично-нейтральный</option>
+      <option value="Законно-злой">Законно-злой</option>
+      <option value="Хаотично-злой">Хаотично-злой</option>
+    </select>
+  </label>
+</div>
       </label>
       <div class="row-compact">
         <label>КД:
@@ -159,11 +203,22 @@
       <label>Языки:
         <input type="text" id="languages">
       </label>
-      <label>Уровень опасности:
-        <input type="text" id="cr">
-      </label>
-      <label>Бонус мастерства:
-        <input type="number" id="proficiency_bonus">
+        <div class="row-compact" style="justify-content: flex-start; gap: 40px;">
+  <label style="flex: 0 1 auto;">Уровень опасности (CR):
+    <select id="cr" style="width: 80px;">
+      <option value="0">0</option>
+      <option value="1/8">1/8</option>
+      <option value="1/4">1/4</option>
+      <option value="1/2">1/2</option>
+      <script>
+        for(let i=1; i<=30; i++) document.write(`<option value="${i}">${i}</option>`);
+      </script>
+    </select>
+  </label>
+  <label style="flex: 0 1 auto;">Бонус мастерства:
+    <input type="number" id="proficiency_bonus" value="2" min="2" step="1" style="width: 60px;">
+  </label>
+</div>
       </label>
       <label>Особые свойства:
         <textarea id="traits"></textarea>

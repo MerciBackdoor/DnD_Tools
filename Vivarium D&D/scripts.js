@@ -1,10 +1,9 @@
 const fields = [
-  'name', 'summary', 'ac', 'hp', 'hit_dice', 'speed',
+  'name', 'size', 'type', 'alignment', 'ac', 'hp', 'hit_dice', 'speed',
   'str', 'dex', 'con', 'int', 'wis', 'cha',
   'saves', 'immune_damage', 'immune_conditions', 'resistances',
-  'vulnerabilities', // <-- add here
-  'senses', 'languages', 'cr', 'proficiency_bonus',
-  'traits', 'actions', 'description', 'author', 'image' // <-- added image
+  'vulnerabilities', 'senses', 'languages', 'cr', 'proficiency_bonus',
+  'traits', 'actions', 'description', 'author', 'image'
 ];
 
 let savedEnemies = JSON.parse(localStorage.getItem('dnd_enemies') || '[]');
@@ -293,65 +292,113 @@ function formatMultiField(field) {
 
 // View enemy in a new window
 function viewEnemy(enemy) {
-  const win = window.open('', '_blank', 'width=700,height=900');
-  let html = `<html><head><title>${enemy.name || 'Враг'}</title>
+    const win = window.open('', '_blank', 'width=800,height=900');
+
+    // Логика определения занимаемого места на сетке
+    const sizeMap = {
+        'Крошечный': '1/4 клетки',
+        'Маленький': '1 клетка',
+        'Средний': '1 клетка',
+        'Большой': '2x2 клетки',
+        'Огромный': '3x3 клетки',
+        'Громадный': '4x4 клетки или больше'
+    };
+    const spaceInfo = sizeMap[enemy.size] || '';
+
+    let html = `<html><head><title>${enemy.name || 'Враг'}</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Cormorant Garamond', serif; background: #18191c; color: #e0e0e0; padding: 30px; margin:0; min-height:100vh; display:flex; flex-direction:column; }
-    h2 { text-align: center; color: #e74c3c; text-shadow: 0 0 8px #000, 0 0 2px #e74c3c; font-size:2.2em; margin-bottom: 18px;}
-    .block { margin-bottom: 14px; }
-    .stat-row { display: flex; gap: 10px; }
-    .stat-row span { flex: 1; }
-    .label { font-weight: bold; }
-    .desc { margin-top: 10px; font-style: italic; }
-    a { color: #e74c3c; }
-    .mod { color: #aaa; font-size: 1.1em; margin-left: 2px; }
-    .big-num { font-size: 1.35em; font-weight: bold; color: #fff; }
-    .author-line { font-size: 0.85em; color: #888; position: absolute; left: 30px; bottom: 18px; }
-    .main-content { flex:1; position:relative; }
-    body { position: relative; }
-    .monster-image { display:block; margin: 0 auto 16px auto; max-width:600px; max-height:600px; border-radius:10px; box-shadow:0 0 8px #0008; }
+    body { font-family: 'Cormorant Garamond', serif; background: #18191c; color: #e0e0e0; padding: 30px; margin:0; min-height:100vh; display:flex; flex-direction:column; line-height: 1.4; }
+    h2 { text-align: left; color: #e74c3c; text-shadow: 0 0 2px #e74c3c; font-size:2.4em; margin-bottom: 5px; margin-top: 0;}
+    .subtitle { font-style: italic; color: #bbb; font-size: 1.2em; margin-bottom: 15px; border-bottom: 2px solid #e74c3c; padding-bottom: 5px; }
+    .block { margin-bottom: 12px; }
+    .label { font-weight: bold; color: #e74c3c; text-transform: uppercase; font-size: 0.9em; }
+    .desc { margin-top: 10px; font-style: italic; white-space: pre-line; }
+    .mod { color: #aaa; font-size: 0.9em; }
+    .big-num { font-size: 1.3em; font-weight: bold; color: #fff; }
+    .author-line { font-size: 0.85em; color: #555; margin-top: 40px; border-top: 1px solid #333; padding-top: 10px; }
+    .main-content { flex:1; }
+    .monster-image { display:block; margin: 20px 0; max-width:100%; height:auto; border-radius:10px; box-shadow:0 0 15px #000; }
     .multi-field { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-    .multi-field span { background: #444; color: #e0e0e0; border-radius: 2px; padding: 2px 8px; font-size: 0.98em; }
+    .multi-field span { background: #333; color: #e0e0e0; border-radius: 2px; padding: 2px 8px; font-size: 0.95em; border: 1px solid #444; }
   </style>
   </head><body>
   <div class="main-content">`;
-  html += `<h2>${formatText(enemy.name) || 'Безымянный'}</h2>`;
-  html += `<div class="block"><span class="label"></span> ${formatText(enemy.summary) || ''}</div>`;
-  html += `<div class="block"><span class="label">КД:</span> <span class="big-num">${enemy.ac || ''}</span> <span class="label">ХП:</span> <span class="big-num">${enemy.hp || ''}</span> <span class="label">Кубики:</span> <span class="big-num">${enemy.hit_dice || ''}</span></div>`;
-  html += `<div class="block"><span class="label">Скорость:</span> <span class="big-num">${enemy.speed ? enemy.speed + ' футов' : ''}</span></div>`;
-  // --- STAT TABLE (see next section) ---
-  html += `<div class="block"><table style="width:100%;background:#232326;border-radius:4px;"><tr>
-    <th>СИЛ</th><th>ЛОВ</th><th>ТЕЛ</th><th>ИНТ</th><th>МУД</th><th>ХАР</th></tr>
-    <tr>
-      <td style="text-align:center;">${enemy.str || ''} <span class="mod">(${getModifier(enemy.str)})</span></td>
-      <td style="text-align:center;">${enemy.dex || ''} <span class="mod">(${getModifier(enemy.dex)})</span></td>
-      <td style="text-align:center;">${enemy.con || ''} <span class="mod">(${getModifier(enemy.con)})</span></td>
-      <td style="text-align:center;">${enemy.int || ''} <span class="mod">(${getModifier(enemy.int)})</span></td>
-      <td style="text-align:center;">${enemy.wis || ''} <span class="mod">(${getModifier(enemy.wis)})</span></td>
-      <td style="text-align:center;">${enemy.cha || ''} <span class="mod">(${getModifier(enemy.cha)})</span></td>
-    </tr>
-  </table></div>`;
-  // --- END STAT TABLE ---
-  html += `<div class="block"><span class="label">Спасброски:</span> ${formatText(enemy.saves) || ''}</div>`;
-  html += `<div class="block"><span class="label">Иммунитет к урону:</span> <div class="multi-field">${formatMultiField(enemy.immune_damage)}</div></div>`;
-  html += `<div class="block"><span class="label">Иммунитет к состояниям:</span> <div class="multi-field">${formatMultiField(enemy.immune_conditions)}</div></div>`;
-  html += `<div class="block"><span class="label">Сопротивление урону:</span> <div class="multi-field">${formatMultiField(enemy.resistances)}</div></div>`;
-  html += `<div class="block"><span class="label">Уязвимость к урону:</span> <div class="multi-field">${formatMultiField(enemy.vulnerabilities)}</div></div>`;
-  html += `<div class="block"><span class="label">Чувства:</span> ${formatText(enemy.senses) || ''}</div>`;
-  html += `<div class="block"><span class="label">Языки:</span> ${formatText(enemy.languages) || ''}</div>`;
-  html += `<div class="block"><span class="label">Уровень опасности:</span> ${formatText(enemy.cr) || ''} <span class="label">Бонус мастерства:</span> <span class="big-num">${enemy.proficiency_bonus || ''}</span></div>`;
-  html += `<div class="block"><span class="label">ОСОБЫЕ СВОЙСТВА:</span><br>${formatText(enemy.traits)}</div>`;
-  html += `<div class="block"><span class="label">ДЕЙСТВИЯ:</span><br>${formatText(enemy.actions)}</div>`;
-  html += `<div class="block desc"><span class="label">ОПИСАНИЕ:</span><br>${formatText(enemy.description) || ''}</div>`;
-  if (enemy.image) {
-    html += `<div class="block"><img src="${enemy.image}" class="monster-image" alt="Изображение существа"></div>`;
-  }
-  html += `</div>`;
-  html += `<div class="author-line">Автор: ${formatText(enemy.author) || ''}</div>`;
-  html += `</body></html>`;
-  win.document.write(html);
-  win.document.close();
+
+    // Заголовок и подзаголовок (Размер, Тип, Мировоззрение)
+    html += `<h2>${formatText(enemy.name) || 'Безымянный'}</h2>`;
+    html += `<div class="subtitle">${enemy.size || ''} ${enemy.type || ''}, ${enemy.alignment || ''} ${spaceInfo ? `(${spaceInfo})` : ''}</div>`;
+
+    // Основные параметры (КД, ХП, Скорость)
+    html += `<div class="block">
+        <span class="label">Класс Доспеха:</span> <span class="big-num">${enemy.ac || '10'}</span><br>
+        <span class="label">Хиты:</span> <span class="big-num">${enemy.hp || '0'}</span> <i>(${enemy.hit_dice || ''})</i><br>
+        <span class="label">Скорость:</span> <span class="big-num">${enemy.speed ? enemy.speed + ' футов' : '0 футов'}</span>
+    </div>`;
+
+    // --- ТАБЛИЦА ХАРАКТЕРИСТИК (Компактная, прижата влево) ---
+    html += `
+    <div class="block" style="display: flex; justify-content: flex-start; margin: 15px 0;">
+      <table style="width: 100%; max-width: 450px; background: #232326; border-radius: 5px; border-collapse: collapse; overflow: hidden; border: 1px solid #444;">
+        <tr style="color: #e74c3c; font-size: 0.85em; font-weight: bold;">
+          <th style="padding: 5px; border: 1px solid #444;">СИЛ</th>
+          <th style="padding: 5px; border: 1px solid #444;">ЛОВ</th>
+          <th style="padding: 5px; border: 1px solid #444;">ТЕЛ</th>
+          <th style="padding: 5px; border: 1px solid #444;">ИНТ</th>
+          <th style="padding: 5px; border: 1px solid #444;">МУД</th>
+          <th style="padding: 5px; border: 1px solid #444;">ХАР</th>
+        </tr>
+        <tr>
+          <td style="text-align:center; padding: 8px;"><div>${enemy.str || '10'}</div><div class="mod">(${getModifier(enemy.str)})</div></td>
+          <td style="text-align:center; padding: 8px;"><div>${enemy.dex || '10'}</div><div class="mod">(${getModifier(enemy.dex)})</div></td>
+          <td style="text-align:center; padding: 8px;"><div>${enemy.con || '10'}</div><div class="mod">(${getModifier(enemy.con)})</div></td>
+          <td style="text-align:center; padding: 8px;"><div>${enemy.int || '10'}</div><div class="mod">(${getModifier(enemy.int)})</div></td>
+          <td style="text-align:center; padding: 8px;"><div>${enemy.wis || '10'}</div><div class="mod">(${getModifier(enemy.wis)})</div></td>
+          <td style="text-align:center; padding: 8px;"><div>${enemy.cha || '10'}</div><div class="mod">(${getModifier(enemy.cha)})</div></td>
+        </tr>
+      </table>
+    </div>`;
+
+    // Особенности (Спасброски, Сопротивления и т.д.)
+    if (enemy.saves) html += `<div class="block"><span class="label">Спасброски:</span> ${formatText(enemy.saves)}</div>`;
+    
+    const multiFields = [
+        { label: 'Иммунитет к урону', val: enemy.immune_damage },
+        { label: 'Иммунитет к состояниям', val: enemy.immune_conditions },
+        { label: 'Сопротивление урону', val: enemy.resistances },
+        { label: 'Уязвимость к урону', val: enemy.vulnerabilities }
+    ];
+
+    multiFields.forEach(f => {
+        if (f.val) {
+            html += `<div class="block"><span class="label">${f.label}:</span> <div class="multi-field">${formatMultiField(f.val)}</div></div>`;
+        }
+    });
+
+    html += `<div class="block"><span class="label">Чувства:</span> ${formatText(enemy.senses) || '—'}</div>`;
+    html += `<div class="block"><span class="label">Языки:</span> ${formatText(enemy.languages) || '—'}</div>`;
+
+    // ОПАСНОСТЬ И БОНУС (На разных строках, оба выделены)
+    html += `<div class="block"><span class="label">Уровень опасности:</span> <span class="big-num">${enemy.cr || '0'}</span></div>`;
+    html += `<div class="block"><span class="label">Бонус мастерства:</span> <span class="big-num">+${enemy.proficiency_bonus || '2'}</span></div>`;
+
+    // Способности и Действия
+    html += `<div style="border-top: 2px solid #e74c3c; margin-top: 15px; padding-top: 10px;"></div>`;
+    if (enemy.traits) html += `<div class="block">${formatText(enemy.traits)}</div>`;
+    if (enemy.actions) html += `<div class="block"><span class="label" style="font-size: 1.2em;">Действия</span><br>${formatText(enemy.actions)}</div>`;
+    if (enemy.description) html += `<div class="block desc"><span class="label">Описание</span><br>${formatText(enemy.description)}</div>`;
+
+    // Изображение
+    if (enemy.image) {
+        html += `<img src="${enemy.image}" class="monster-image" alt="Изображение">`;
+    }
+
+    html += `</div>`; // Конец main-content
+    html += `<div class="author-line">Автор: ${formatText(enemy.author) || 'Неизвестен'}</div>`;
+    html += `</body></html>`;
+
+    win.document.write(html);
+    win.document.close();
 }
 
 // Download enemy JSON, ask for path if possible
