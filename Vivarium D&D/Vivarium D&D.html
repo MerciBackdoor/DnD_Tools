@@ -16,7 +16,7 @@
     <h1>D&D Виварий</h1>
     <div id="top-buttons">
       <button type="button" onclick="clearForm()">Очистить</button>
-      <input type="file" id="fileInput" accept=".json" onchange="importData(event)">
+      <input type="file" id="fileInput" accept=".json" multiple onchange="importData(event)">
       <label for="fileInput" id="import-btn-label">Импорт</label>
     </div>
     <form id="monster-form">

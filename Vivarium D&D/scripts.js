@@ -181,23 +181,46 @@ function updateSpeedSuffix(input) {
 }
 
 function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+  const files = event.target.files;
+  if (!files || files.length === 0) return;
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = JSON.parse(e.target.result);
-      // Просто добавляем врага в список, не заполняя форму
-      savedEnemies.push(data);
-      localStorage.setItem('dnd_enemies', JSON.stringify(savedEnemies));
-      renderEnemyList();
-      // Не трогаем форму, предпросмотр, автора и скорость
-    } catch (err) {
-      alert('Ошибка загрузки файла');
-    }
-  };
-  reader.readAsText(file);
+  // Используем Promise.all, чтобы дождаться чтения всех файлов
+  const readers = Array.from(files).map(file => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          // Если это массив врагов (экспорт всей базы), добавляем всех
+          if (Array.isArray(data)) {
+            savedEnemies.push(...data);
+          } else {
+            // Если это один враг
+            savedEnemies.push(data);
+          }
+          resolve();
+        } catch (err) {
+          console.error('Ошибка парсинга файла:', file.name);
+          resolve(); // Продолжаем даже если один файл битый
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsText(file);
+    });
+  });
+
+  Promise.all(readers).then(() => {
+    // Сохраняем обновленный список в localStorage
+    localStorage.setItem('dnd_enemies', JSON.stringify(savedEnemies));
+    // Перерисовываем список в сайдбаре
+    renderEnemyList();
+    // Очищаем input, чтобы можно было загрузить те же файлы повторно
+    event.target.value = '';
+    alert(`Успешно импортировано файлов: ${files.length}`);
+  }).catch(err => {
+    alert('Произошла ошибка при чтении файлов');
+    console.error(err);
+  });
 }
 
 function renderEnemyList() {
