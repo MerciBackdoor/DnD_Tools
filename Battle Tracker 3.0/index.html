@@ -11,10 +11,11 @@
   <h1>D&D Battle Tracker</h1>
   <div class="top-controls">
     <div class="file-ops">
-      <input type="file" id="importFile" accept=".json">
-      <button id="load-btn" class="icon-btn">📂 Загрузить</button>
-      <button id="export-btn" class="icon-btn" onclick="exportCombatants()">💾 Сохранить</button>
-    </div>
+  <input type="file" id="importFile" accept=".json" multiple style="display:none">
+  
+  <button id="load-btn" class="icon-btn" onclick="document.getElementById('importFile').click()">📂 Загрузить</button>
+  <button id="export-btn" class="icon-btn" onclick="exportCombatants()">💾 Сохранить</button>
+</div>
   </div>
   <form id="addForm" oninput="fixLeadingZeros(event)">
     <input type="text" id="name" placeholder="Имя" required>

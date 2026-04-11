@@ -4,7 +4,46 @@ let currentTurnIndex = 0;
 document.addEventListener('DOMContentLoaded', () => {
     loadCombatants();
     document.getElementById('addForm').addEventListener('submit', handleAdd);
+    
+    // Привязываем выбор файла к функции обработки
+    const importInput = document.getElementById('importFile');
+    if (importInput) {
+        importInput.addEventListener('change', handleImport);
+    }
 });
+
+function handleImport(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const readers = Array.from(files).map(file => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    const newEntries = Array.isArray(data) ? data : [data];
+                    
+                    // Добавляем бойцов в общий массив трекера
+                    combatants.push(...newEntries);
+                    resolve();
+                } catch (err) {
+                    console.error('Ошибка при чтении файла:', file.name, err);
+                    resolve();
+                }
+            };
+            reader.readAsText(file);
+        });
+    });
+
+    Promise.all(readers).then(() => {
+        // Сортируем, сохраняем в локальное хранилище и перерисовываем список
+        sortAndRender();
+        
+        // Очищаем инпут для возможности повторной загрузки
+        event.target.value = '';
+    });
+}
 
 // Предохранитель: заменяет 0 на вводимую цифру (011 -> 11)
 window.fixLeadingZeros = (e) => {
@@ -263,4 +302,42 @@ window.exportCombatants = () => {
     a.href = URL.createObjectURL(blob);
     a.download = 'battle_tracker_pro.json';
     a.click();
+};
+window.importCombatants = (event) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    // Читаем все выбранные файлы
+    const readers = Array.from(files).map(file => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Если в файле массив (как в твоем случае), добавляем всех.
+                    // Если один объект — превращаем в массив из одного элемента.
+                    const newEntries = Array.isArray(data) ? data : [data];
+                    
+                    // Добавляем новых бойцов в общий список
+                    combatants.push(...newEntries);
+                    resolve();
+                } catch (err) {
+                    console.error('Ошибка при чтении файла:', file.name, err);
+                    resolve();
+                }
+            };
+            reader.readAsText(file);
+        });
+    });
+
+    // Когда все файлы прочитаны
+    Promise.all(readers).then(() => {
+        // Сортируем по инициативе, сохраняем в память и обновляем экран
+        sortAndRender();
+        
+        // Очищаем поле выбора, чтобы можно было загрузить тот же файл снова
+        event.target.value = '';
+        alert('Враги успешно импортированы на арену!');
+    });
 };
