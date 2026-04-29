@@ -199,7 +199,16 @@ window.changeHp = (index, sign) => {
 
 window.nextTurn = () => {
     if (!combatants.length) return;
-    currentTurnIndex = (currentTurnIndex + 1) % combatants.length;
+    // Если все мертвы, не переключаем
+    if (combatants.every(c => c.isDead)) return;
+
+    let nextIndex = (currentTurnIndex + 1) % combatants.length;
+    // Пропускаем мертвых, пока не найдем живого
+    while (combatants[nextIndex].isDead) {
+        nextIndex = (nextIndex + 1) % combatants.length;
+    }
+    currentTurnIndex = nextIndex;
+
     combatants.forEach(c => {
         if (c.concentration && c.concentrationCounter > 0) {
             c.concentrationCounter--;
@@ -211,7 +220,16 @@ window.nextTurn = () => {
 
 window.prevTurn = () => {
     if (!combatants.length) return;
-    currentTurnIndex = (currentTurnIndex - 1 + combatants.length) % combatants.length;
+    // Если все мертвы, не переключаем
+    if (combatants.every(c => c.isDead)) return;
+
+    let prevIndex = (currentTurnIndex - 1 + combatants.length) % combatants.length;
+    // Пропускаем мертвых, пока не найдем живого
+    while (combatants[prevIndex].isDead) {
+        prevIndex = (prevIndex - 1 + combatants.length) % combatants.length;
+    }
+    currentTurnIndex = prevIndex;
+
     combatants.forEach(c => {
         if (c.concentration) {
             c.concentrationCounter++;
