@@ -24,7 +24,7 @@ h1 { text-align: center; font-size: 2.2em; margin: 0 0 10px 0; }
 
 .combatant-main-row {
   display: grid;
-  grid-template-columns: 40px 1.2fr 80px 160px 50px 50px 80px 1.8fr 120px;
+  grid-template-columns: 40px 1.2fr 80px 100px 60px 50px 50px 80px 1.8fr 120px;
   align-items: center; gap: 12px;
 }
 
@@ -35,16 +35,24 @@ h1 { text-align: center; font-size: 2.2em; margin: 0 0 10px 0; }
 
 .icon-btn { background: none; border: none; color: #ecf0f1; cursor: pointer; font-size: 18px; display: inline-flex; align-items: center; justify-content: center; }
 
-.hp-control { display: flex; align-items: center; gap: 5px; }
+.hp-control { display: flex; align-items: center; gap: 5px; justify-content: flex-start; }
 .hp-control button { background: none; border: none; padding: 0; }
 
-.cond-box { position: relative; }
-.condition-menu {
+.exhaust-box, .cond-box { position: relative; }
+.exhaust-menu, .condition-menu {
   display: none; position: absolute; top: 100%; left: 0; background: #1a252f;
   border: 1px solid #7f8c8d; z-index: 100; padding: 10px; border-radius: 5px;
-  width: 200px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
-.condition-menu.open { display: flex; flex-direction: column; gap: 5px; }
+.exhaust-menu.open { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 220px; }
+.condition-menu.open { display: flex; flex-direction: column; gap: 5px; width: 200px; }
+
+.exhaust-header { font-family: 'Neucha', cursive; font-size: 0.9em; border-bottom: 1px solid #7f8c8d; width: 100%; text-align: center; padding-bottom: 5px; }
+.exhaust-row { display: flex; justify-content: space-between; width: 100%; gap: 5px; }
+.exhaust-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.exhaust-item input { cursor: pointer; margin: 0; }
+.exhaust-item span { font-size: 0.8em; font-family: 'Neucha', cursive; color: #bdc3c7; }
+
 .condition-menu label { font-family: 'Neucha', cursive; font-size: 0.9em; cursor: pointer; }
 
 .health-bar {
@@ -60,12 +68,12 @@ h1 { text-align: center; font-size: 2.2em; margin: 0 0 10px 0; }
 .notes-area { margin-top: 10px; display: none; }
 .combatant.notes-open .notes-area { display: block; }
 .notes-view {
-  background: #1a252f; border: 1px solid #7f8c8d; border-radius: 5px; padding: 8px;
-  font-family: 'Neucha', cursive; white-space: pre-wrap; cursor: text; line-height: 1.4;
+  background: #1a252f; border: 1px solid #7f8c8d; border-radius: 5px; padding: 10px;
+  font-family: 'Neucha', cursive; white-space: pre-wrap; cursor: text; line-height: 1.4; text-align: left;
 }
 .notes-input {
-  width: 100%; background: #1a252f; color: #bdc3c7; border: 1px solid #f1c40f;
-  border-radius: 5px; padding: 8px; font-family: 'Neucha', cursive; min-height: 60px;
+  width: 100%; background: #1a252f; color: #ecf0f1; border: 1px solid #f1c40f;
+  border-radius: 5px; padding: 10px; font-family: 'Neucha', cursive; min-height: 80px;
 }
 
 .text-adv { color: #54b75d; font-weight: bold; }
@@ -75,9 +83,25 @@ h1 { text-align: center; font-size: 2.2em; margin: 0 0 10px 0; }
   display: flex; justify-content: center; gap: 15px; margin-top: 10px;
   background: rgba(0,0,0,0.2); padding: 5px; border-radius: 5px;
 }
+.death-save-group { display: flex; align-items: center; gap: 8px; }
 .death-dot { width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; cursor: pointer; }
 .death-dot.success.active { background: #2ecc71; border-color: #2ecc71; }
 .death-dot.failure.active { background: #e74c3c; border-color: #e74c3c; }
 
 input { background: #2c3e50; border: 1px solid #7f8c8d; color: white; border-radius: 4px; padding: 2px; text-align: center; }
+input:focus { outline: 1px solid #f1c40f; }
 .remove-btn { color: #e74c3c !important; }
+
+/* Грязно-желтый для истощения */
+.death-exhaustion {
+    color: #c2b13c; 
+    font-weight: bold;
+    text-transform: uppercase;
+}
+/* Ярко-красный для крови */
+.death-blood {
+    color: #ff0000;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+    text-transform: uppercase;
+}
