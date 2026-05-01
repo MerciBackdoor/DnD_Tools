@@ -33,10 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('addForm').addEventListener('submit', handleAdd);
     
     document.addEventListener('click', (e) => {
-        // Если кликнули в поле ввода — ничего не делаем, чтобы не сбивать фокус
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
-        // Если кликнули мимо меню — закрываем их
         if (!e.target.closest('.cond-box') && !e.target.closest('.exhaust-box')) {
             let changed = false;
             combatants.forEach(c => {
@@ -82,6 +79,7 @@ function handleAdd(e) {
         name: document.getElementById('name').value,
         ac: Math.max(0, acVal),
         hp: hpInput === "" ? maxHpVal : parseInt(hpInput),
+        tempHp: 0,
         maxHp: maxHpVal,
         baseMaxHp: maxHpVal,
         initiative: Math.max(-5, initVal),
@@ -90,6 +88,7 @@ function handleAdd(e) {
         showNotes: false,
         deathSaves: { success: 0, failure: 0 },
         isDead: false,
+        inspiration: false,
         concentration: false,
         concentrationCounter: 0,
         maxConcentration: 0,
@@ -109,11 +108,17 @@ function render() {
     combatants.forEach((c, index) => {
         const div = document.createElement('div');
         div.className = `combatant ${index === currentTurnIndex ? 'active' : ''} ${c.isDead ? 'dead' : ''} ${c.isCollapsed ? 'collapsed' : ''} ${c.showNotes ? 'notes-open' : ''}`;
+        
         const hpPct = Math.min(Math.max((c.hp / c.maxHp) * 100, 0), 100);
+        const tempPct = Math.min((c.tempHp / c.maxHp) * 100, 100);
+        
         div.innerHTML = `
             <div class="combatant-main-row">
                 <button class="icon-btn" onclick="toggleCollapse(${index})">${c.isCollapsed ? '▶' : '▼'}</button>
                 <div class="combatant-name hide-on-collapse"><b>${c.name} ${c.isDead ? '💀' : ''}</b></div>
+                <div class="inspiration-box hide-on-collapse" title="Вдохновение" onclick="toggleInspiration(${index})">
+                    ${c.inspiration ? '⭐' : '<div class="insp-checkbox"></div>'}
+                </div>
                 <div class="ac-box hide-on-collapse">🛡️ <input type="number" value="${c.ac}" onchange="updateProp(${index}, 'ac', this.value)" style="width:35px" min="0"></div>
                 <div class="hp-control hide-on-collapse">
                     <button class="icon-btn" onclick="changeHp(${index}, -1)">⚔️</button>
@@ -147,8 +152,11 @@ function render() {
                 </div>
                 <div class="init-box hide-on-collapse">⏳ <input type="number" value="${c.initiative}" onchange="updateProp(${index}, 'initiative', this.value)" style="width:35px" min="-5"></div>
                 <div class="health-bar hide-on-collapse">
-                    <div class="health-text">${c.hp <= 0 && !c.isDead ? 'СПАСБРОСКИ' : c.hp + ' / ' + c.maxHp}</div>
+                    <div class="health-text" onclick="setTempHp(${index})">
+                        ${c.hp <= 0 && !c.isDead ? 'СПАСБРОСКИ' : (c.tempHp > 0 ? `(${c.tempHp}) + ` : '') + c.hp + ' / ' + c.maxHp}
+                    </div>
                     <div class="health-bar-inner" style="width: ${hpPct}%; background: ${getHpColor(hpPct)}"></div>
+                    <div class="health-bar-temp" style="width: ${tempPct}%;"></div>
                 </div>
                 <div class="actions hide-on-collapse">
                     <button class="icon-btn" onclick="toggleNotes(${index})">📝</button>
@@ -178,19 +186,32 @@ window.changeHp = (index, sign) => {
             c.deathSaves = {success: 0, failure: 0}; 
         }
     } else {
+        // Механика Временных ХП (щит)
+        if (c.tempHp > 0) {
+            if (mod <= c.tempHp) {
+                c.tempHp -= mod;
+                mod = 0;
+            } else {
+                mod -= c.tempHp;
+                c.tempHp = 0;
+            }
+        }
+
         const overkillThreshold = Math.floor(c.maxHp / 2);
         const deathThreshold = c.hp + overkillThreshold;
         
-        if (mod >= deathThreshold) {
-            c.hp = 0;
-            c.isDead = true;
-            c.showNotes = true;
-            const deathMsg = `СМЕРТЬ ОТ МАССИВНОГО УРОНА (Получено ${mod} при пороге в ${deathThreshold})`;
-            if (!c.notes.includes("СМЕРТЬ ОТ МАССИВНОГО УРОНА")) {
-                c.notes = (deathMsg + "\n" + c.notes).trim();
+        if (mod > 0) {
+            if (mod >= deathThreshold) {
+                c.hp = 0;
+                c.isDead = true;
+                c.showNotes = true;
+                const deathMsg = `СМЕРТЬ ОТ МАССИВНОГО УРОНА (Получено ${mod} при пороге в ${deathThreshold})`;
+                if (!c.notes.includes("СМЕРТЬ ОТ МАССИВНОГО УРОНА")) {
+                    c.notes = (deathMsg + "\n" + c.notes).trim();
+                }
+            } else {
+                c.hp = Math.max(0, c.hp - mod);
             }
-        } else {
-            c.hp = Math.max(0, c.hp - mod);
         }
         if (c.hp <= 0) c.concentration = false;
     }
@@ -199,7 +220,12 @@ window.changeHp = (index, sign) => {
 
 window.nextTurn = () => {
     if (!combatants.length) return;
-    currentTurnIndex = (currentTurnIndex + 1) % combatants.length;
+    if (combatants.every(c => c.isDead)) return;
+    let nextIndex = (currentTurnIndex + 1) % combatants.length;
+    while (combatants[nextIndex].isDead) {
+        nextIndex = (nextIndex + 1) % combatants.length;
+    }
+    currentTurnIndex = nextIndex;
     combatants.forEach(c => {
         if (c.concentration && c.concentrationCounter > 0) {
             c.concentrationCounter--;
@@ -211,7 +237,12 @@ window.nextTurn = () => {
 
 window.prevTurn = () => {
     if (!combatants.length) return;
-    currentTurnIndex = (currentTurnIndex - 1 + combatants.length) % combatants.length;
+    if (combatants.every(c => c.isDead)) return;
+    let prevIndex = (currentTurnIndex - 1 + combatants.length) % combatants.length;
+    while (combatants[prevIndex].isDead) {
+        prevIndex = (prevIndex - 1 + combatants.length) % combatants.length;
+    }
+    currentTurnIndex = prevIndex;
     combatants.forEach(c => {
         if (c.concentration) {
             c.concentrationCounter++;
@@ -224,33 +255,41 @@ window.prevTurn = () => {
     render();
 };
 
+window.toggleInspiration = (i) => {
+    combatants[i].inspiration = !combatants[i].inspiration;
+    saveCombatants();
+    render();
+};
+
+window.setTempHp = (i) => {
+    const val = prompt("Введите количество временных ХП:", combatants[i].tempHp || 0);
+    if (val !== null) {
+        combatants[i].tempHp = Math.max(0, parseInt(val) || 0);
+        saveCombatants();
+        render();
+    }
+};
+
 window.updateExhaustion = (i, level) => {
     const c = combatants[i];
     EXHAUSTION_EFFECTS.forEach(eff => { if(eff) c.notes = c.notes.replace(eff, "").trim(); });
     c.exhaustion = level;
     c.maxHp = (level >= 4) ? Math.floor(c.baseMaxHp / 2) : c.baseMaxHp;
-    
     if (c.hp > c.maxHp) c.hp = c.maxHp;
-
     for(let j=1; j<=level; j++) {
         const eff = EXHAUSTION_EFFECTS[j];
         if(!c.notes.includes(eff)) c.notes = (c.notes.trim() + (c.notes.trim() ? '\n' : '') + eff).trim();
     }
-
     if(level > 0) c.showNotes = true;
-
     if(level === 6) { 
         c.isDead = true; 
         c.hp = 0; 
         const fadeMsg = `${c.name} угас от истощения`;
-        if (!c.notes.includes(fadeMsg)) {
-            c.notes = (fadeMsg + "\n" + c.notes).trim();
-        }
+        if (!c.notes.includes(fadeMsg)) { c.notes = (fadeMsg + "\n" + c.notes).trim(); }
     }
     else if(c.isDead && level < 6 && (c.hp > 0 || (c.deathSaves.success < 3 && c.deathSaves.failure < 3))) { 
         c.isDead = false; 
     }
-
     c.notes = c.notes.replace(/\n\s*\n/g, '\n').trim();
     saveCombatants();
     render();
@@ -357,9 +396,7 @@ else if (t === 'failure' && c.deathSaves.failure >= 3) {
         c.isDead = true;
         c.showNotes = true; 
         const deathMsg = `${c.name} умер от потери крови`;
-        if (!c.notes.includes(deathMsg)) {
-            c.notes = (deathMsg + "\n" + c.notes).trim();
-        }
+        if (!c.notes.includes(deathMsg)) { c.notes = (deathMsg + "\n" + c.notes).trim(); }
     }
     sortAndRender();
 };
@@ -369,4 +406,10 @@ window.exportCombatants = () => {
     a.href = URL.createObjectURL(blob);
     a.download = 'battle_tracker.json';
     a.click();
+};
+
+window.fixLeadingZeros = (e) => {
+    if (e.target.type === 'number' && e.target.value.length > 1 && e.target.value.startsWith('0')) {
+        e.target.value = parseInt(e.target.value);
+    }
 };
