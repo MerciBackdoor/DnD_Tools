@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор NPC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=Neucha&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="icon_small.ico" type="image/x-icon">
+</head>
+<body>
+
+    <div class="npc-generator-container">
+        <div class="npc-header">
+            <h1>Генератор NPC</h1>
+            <button class="clear-all-btn" onclick="clearAllSlots()" title="Очистить все ячейки">🗑️</button>
+        </div>
+        
+        <div id="npc-display" class="npc-cards-wrapper">
+            <div id="npc-slot-1" class="npc-card empty">
+                <p class="placeholder">🎲</p>
+            </div>
+            <div id="npc-slot-2" class="npc-card empty">
+                <p class="placeholder">🎲</p>
+            </div>
+            <div id="npc-slot-3" class="npc-card empty">
+                <p class="placeholder">🎲</p>
+            </div>
+        </div>
+
+        <div class="filters-container">
+            <h3>Фильтры генерации</h3>
+            <div class="select-group">
+                <div class="select-wrapper">
+                    <label for="filter-gender">Пол:</label>
+                    <select id="filter-gender">
+                        <option value="">Любой</option>
+                        <option value="Мужчина">Мужчина</option>
+                        <option value="Женщина">Женщина</option>
+                    </select>
+                </div>
+                
+                <div class="select-wrapper">
+                    <label for="filter-race">Раса:</label>
+                    <select id="filter-race">
+                        <option value="">Любая</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button class="npc-btn" onclick="generateNPC()">Создать NPC</button>
+    </div>
+
+    <script src="npc_data.js"></script>
+    <script src="scripts.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const raceSelect = document.getElementById('filter-race');
+            if (typeof npcData !== 'undefined' && npcData.races) {
+                npcData.races.forEach(race => {
+                    const option = document.createElement('option');
+                    option.value = race;
+                    option.textContent = race;
+                    raceSelect.appendChild(option);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
