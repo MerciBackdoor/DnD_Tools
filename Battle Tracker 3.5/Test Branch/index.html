@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>D&D Battle Tracker</title>
+  <link rel="icon" type="image/x-icon" href="battletracker_ico.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=Neucha&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>D&D Battle Tracker</h1>
+  <div class="top-controls">
+    <div class="file-ops">
+      <input type="file" id="importFile" accept=".json" style="display:none">
+      <button id="load-btn" class="icon-btn" onclick="document.getElementById('importFile').click()">📂 Загрузить</button>
+      <button id="export-btn" class="icon-btn" onclick="exportCombatants()">💾 Сохранить</button>
+    </div>
+  </div>
+  <form id="addForm" oninput="fixLeadingZeros(event)">
+    <input type="text" id="name" placeholder="Имя" required>
+    <input type="number" id="ac" placeholder="КД" min="0" required title="Минимум 0">
+    <input type="number" id="hp" placeholder="ХП">
+    <input type="number" id="maxHp" placeholder="Макс. ХП" min="1" required>
+    <input type="number" id="initiative" placeholder="Инициатива" min="-5" required title="Минимум -5">
+    <button type="submit">➕ Добавить</button>
+  </form>
+<div id="controls">
+  <div class="turn-controls">
+    <button onclick="prevTurn()">👈</button>
+    <button onclick="nextTurn()">👉</button>
+  </div>
+  <button class="long-rest-btn" onclick="longRest()" title="Долгий отдых">🌖</button>
+</div>
+  <div id="combatants"></div>
+  <script src="scripts.js"></script>
+</body>
+</html>

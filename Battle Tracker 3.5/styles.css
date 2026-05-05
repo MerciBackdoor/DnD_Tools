@@ -1,0 +1,161 @@
+@import url('https://fonts.googleapis.com/css2?family=Neucha&display=swap');
+
+body {
+  font-family: 'Cormorant Garamond', serif;
+  background: linear-gradient(to bottom, #2c3e50, #34495e);
+  color: #ecf0f1;
+  margin: 0;
+  padding: 10px 20px;
+}
+
+h1 { text-align: center; font-size: 2.2em; margin: 0 0 10px 0; }
+.top-controls { text-align: center; margin-bottom: 5px; }
+
+#addForm { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+#addForm input, #addForm button { padding: 6px 12px; font-family: 'Neucha', cursive; font-size: 1em; }
+
+#controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-bottom: 10px;
+  transform: scale(0.8);
+}
+
+.turn-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.long-rest-btn {
+  position: absolute;
+  right: 0;
+  font-size: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: white;
+}
+#controls button { font-size: 32px; background: none; border: none; color: white; cursor: pointer; display: flex; align-items: center; }
+
+.combatant {
+  background: #3b4a59; border: 1px solid #7f8c8d;
+  margin-bottom: 6px; border-radius: 8px; padding: 8px 12px;
+}
+
+.combatant-main-row {
+  display: grid;
+  grid-template-columns: 40px 1.2fr 30px 80px 100px 60px 50px 50px 80px 1.8fr 120px;
+  align-items: center; gap: 12px;
+}
+
+.combatant.collapsed { padding: 4px 12px; background: #2c3e50; }
+.combatant.collapsed .hide-on-collapse { display: none; }
+.combatant.active { border: 2px solid #f1c40f; }
+.combatant.dead { background-color: #470000 !important; }
+
+.icon-btn { background: none; border: none; color: #ecf0f1; cursor: pointer; font-size: 18px; display: inline-flex; align-items: center; justify-content: center; }
+
+.hp-control { display: flex; align-items: center; gap: 5px; justify-content: flex-start; }
+.hp-control button { background: none; border: none; padding: 0; }
+
+.exhaust-box, .cond-box { position: relative; }
+.exhaust-menu, .condition-menu {
+  display: none; position: absolute; top: 100%; left: 0; background: #1a252f;
+  border: 1px solid #7f8c8d; z-index: 100; padding: 10px; border-radius: 5px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+.exhaust-menu.open { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 220px; }
+.condition-menu.open { display: flex; flex-direction: column; gap: 5px; width: 200px; }
+
+.exhaust-header { font-family: 'Neucha', cursive; font-size: 0.9em; border-bottom: 1px solid #7f8c8d; width: 100%; text-align: center; padding-bottom: 5px; }
+.exhaust-row { display: flex; justify-content: space-between; width: 100%; gap: 5px; }
+.exhaust-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.exhaust-item input { cursor: pointer; margin: 0; }
+.exhaust-item span { font-size: 0.8em; font-family: 'Neucha', cursive; color: #bdc3c7; }
+
+.condition-menu label { font-family: 'Neucha', cursive; font-size: 0.9em; cursor: pointer; }
+
+.inspiration-box {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    width: 24px;
+    height: 24px;
+}
+.insp-checkbox {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #7f8c8d;
+    border-radius: 3px;
+}
+
+.health-bar {
+  background: #444; height: 20px; border-radius: 10px;
+  position: relative; overflow: hidden; border: 1px solid #7f8c8d;
+}
+.health-bar-inner { height: 100%; transition: width 0.3s; position: relative; z-index: 1; }
+.health-bar-temp { 
+    height: 100%; 
+    background: #549fd1; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    z-index: 2; 
+    opacity: 0.8; 
+    transition: width 0.3s;
+}
+.health-text {
+  position: absolute; width: 100%; text-align: center; line-height: 20px;
+  font-size: 16px; font-weight: bold; z-index: 5; text-shadow: 1px 1px 2px black;
+}
+.health-text span { cursor: pointer; }
+.health-text span:hover { color: #f1c40f; }
+
+.notes-area { margin-top: 10px; display: none; }
+.combatant.notes-open .notes-area { display: block; }
+.notes-view {
+  background: #1a252f; border: 1px solid #7f8c8d; border-radius: 5px; padding: 10px;
+  font-family: 'Neucha', cursive; white-space: pre-wrap; cursor: text; line-height: 1.4; text-align: left;
+}
+.notes-input {
+  width: 100%; background: #1a252f; color: #ecf0f1; border: 1px solid #f1c40f;
+  border-radius: 5px; padding: 10px; font-family: 'Neucha', cursive; min-height: 80px;
+}
+
+.text-adv { color: #54b75d; font-weight: bold; }
+.text-disadv { color: #FF0000; font-weight: bold; }
+
+.death-saves-row {
+  display: flex; justify-content: center; gap: 15px; margin-top: 10px;
+  background: rgba(0,0,0,0.2); padding: 5px; border-radius: 5px;
+}
+.death-save-group { display: flex; align-items: center; gap: 8px; }
+.death-dot { width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; cursor: pointer; }
+.death-dot.success.active { background: #2ecc71; border-color: #2ecc71; }
+.death-dot.failure.active { background: #e74c3c; border-color: #e74c3c; }
+
+input { background: #2c3e50; border: 1px solid #7f8c8d; color: white; border-radius: 4px; padding: 2px; text-align: center; }
+input:focus { outline: 1px solid #f1c40f; }
+.remove-btn { color: #e74c3c !important; }
+
+.death-exhaustion {
+    color: #c2b13c; 
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.death-blood {
+    color: #ff0000;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+    text-transform: uppercase;
+}
+
+.conc-counter {
+    font-size: 0.9em; /* Делает цифру меньше относительно размера значка */
+    margin-left: 2px;
+    vertical-align: super; /* Поднимает цифру вверх, как индекс */
+}
