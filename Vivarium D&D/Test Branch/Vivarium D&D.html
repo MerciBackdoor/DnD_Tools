@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>D&D Виварий</title>
+  <link rel="icon" type="image/x-icon" href="vivarium_ico.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="sidebar">
+    <h3 class="sidebar-title">⚔ Список врагов ⚔</h3>
+    <ul id="enemy-list"></ul>
+  </div>
+  <div id="main">
+    <h1>D&D Виварий</h1>
+    <div id="top-buttons">
+      <button type="button" onclick="clearForm()">Очистить</button>
+      <div class="file-input-wrapper">
+        <input type="file" id="fileInput" accept=".json" multiple onchange="importData(event)">
+        <label for="fileInput" id="import-btn-label">Импорт</label>
+      </div>
+    </div>
+    <form id="monster-form">
+      <label>Имя врага:
+        <input type="text" id="name">
+      </label>
+      <label>Краткая характеристика:
+        <div class="row-compact">
+          <label>Размер:
+            <select id="size">
+              <option value="Крошечный">Крошечный</option>
+              <option value="Маленький">Маленький</option>
+              <option value="Средний" selected>Средний</option>
+              <option value="Большой">Большой</option>
+              <option value="Огромный">Огромный</option>
+              <option value="Громадный">Громадный</option>
+            </select>
+          </label>
+          <label>Тип:
+            <select id="type">
+              <option value="Аберрация">Аберрация</option>
+              <option value="Зверь">Зверь</option>
+              <option value="Небожитель">Небожитель</option>
+              <option value="Конструкт">Конструкт</option>
+              <option value="Дракон">Дракон</option>
+              <option value="Элементаль">Элементаль</option>
+              <option value="Фея">Фея</option>
+              <option value="Исчадие">Исчадие</option>
+              <option value="Великан">Великан</option>
+              <option value="Гуманоид" selected>Гуманоид</option>
+              <option value="Монстр">Монстр</option>
+              <option value="Растение">Растение</option>
+              <option value="Нежить">Нежить</option>
+              <option value="Слизь">Слизь</option>
+              <option value="Стая крошечных зверей">Стая крошечных зверей</option>
+            </select>
+          </label>
+          <label>Мировоззрение:
+            <select id="alignment">
+              <option value="Без Мировоззрения">Без Мировоззрения</option>
+              <option value="Различное Мировоззрение">Различное Мировоззрение</option>
+              <option value="Законно-добрый">Законно-добрый</option>
+              <option value="Нейтрально-добрый">Нейтрально-добрый</option>
+              <option value="Хаотично-добрый">Хаотично-добрый</option>
+              <option value="Законно-нейтральный">Законно-нейтральный</option>
+              <option value="Истинно нейтральный" selected>Истинно нейтральный</option>
+              <option value="Хаотично-нейтральный">Хаотично-нейтральный</option>
+              <option value="Законно-злой">Законно-злой</option>
+              <option value="Хаотично-злой">Хаотично-злой</option>
+            </select>
+          </label>
+        </div>
+      </label>
+      <div class="row-compact">
+        <label>КД:
+          <input type="number" id="ac" min="0" max="99" style="width:70px;">
+        </label>
+        <label>ХП:
+          <input type="number" id="hp" min="0" max="9999" style="width:90px;">
+        </label>
+        <label>Кубы ХП:
+          <input type="text" id="hit_dice" style="width:100px;">
+        </label>
+      </div>
+      <label>Скорости (в футах):</label>
+      <div class="speed-grid">
+        <div class="speed-col"><label>Ходьба</label><input type="number" id="speed_walk" min="0" value="30"></div>
+        <div class="speed-col"><label>Лазая</label><input type="number" id="speed_climb" min="0" value="0"></div>
+        <div class="speed-col"><label>Летая</label><input type="number" id="speed_fly" min="0" value="0"></div>
+        <div class="speed-col"><label>Плавая</label><input type="number" id="speed_swim" min="0" value="0"></div>
+        <div class="speed-col"><label>Копая</label><input type="number" id="speed_burrow" min="0" value="0"></div>
+      </div>
+      <table class="stat-table">
+        <tr><th>СИЛ</th><th>ЛОВ</th><th>ТЕЛ</th><th>ИНТ</th><th>МУД</th><th>ХАР</th></tr>
+        <tr>
+          <td><input type="number" id="str" min="0" value="10"></td>
+          <td><input type="number" id="dex" min="0" value="10"></td>
+          <td><input type="number" id="con" min="0" value="10"></td>
+          <td><input type="number" id="int" min="0" value="10"></td>
+          <td><input type="number" id="wis" min="0" value="10"></td>
+          <td><input type="number" id="cha" min="0" value="10"></td>
+        </tr>
+      </table>
+      <label>Спасброски:
+        <div class="row-compact" style="gap:10px; margin-bottom:5px;">
+          <select id="save_type" style="width:140px;">
+            <option value="СИЛ">СИЛ</option>
+            <option value="ЛОВ">ЛОВ</option>
+            <option value="ТЕЛ">ТЕЛ</option>
+            <option value="ИНТ">ИНТ</option>
+            <option value="МУД">МУД</option>
+            <option value="ХАР">ХАР</option>
+          </select>
+          <input type="number" id="save_bonus" placeholder="Прибавка" style="width:100px;">
+          <button type="button" onclick="addSave()" style="padding:0 10px;">+</button>
+        </div>
+        <input type="text" id="saves" placeholder="Выбранные спасброски появятся здесь">
+      </label>
+      <label>Иммунитет к урону:
+        <div class="select-container">
+          <div id="immune_damage_display" class="selected-values"></div>
+          <select id="immune_damage" multiple size="10">
+            <option value="Дробящий">Дробящий</option>
+            <option value="Рубящий">Рубящий</option>
+            <option value="Колющий">Колющий</option>
+            <option value="Огонь">Огонь</option>
+            <option value="Холод">Холод</option>
+            <option value="Электричество">Электричество</option>
+            <option value="Кислота">Кислота</option>
+            <option value="Яд">Яд</option>
+            <option value="Силовое поле">Силовое поле</option>
+            <option value="Звук">Звук</option>
+            <option value="Некротический">Некротический</option>
+            <option value="Излучение">Излучение</option>
+            <option value="Психический">Психический</option>
+            <option value="Дробящий от маг. атак">Дробящий от маг. атак</option>
+            <option value="Рубящий от маг. атак">Рубящий от маг. атак</option>
+            <option value="Колющий от маг. атак">Колющий от маг. атак</option>
+          </select>
+        </div>
+      </label>
+      <label>Иммунитет к состояниям:
+        <div class="select-container">
+          <div id="immune_conditions_display" class="selected-values"></div>
+          <select id="immune_conditions" multiple size="10">
+            <option value="Ослепленный">Ослепленный</option>
+            <option value="Очарованный">Очарованный</option>
+            <option value="Глухой">Глухой</option>
+            <option value="Испуганный">Испуганный</option>
+            <option value="Схваченный">Схваченный</option>
+            <option value="Недееспособный">Недееспособный</option>
+            <option value="Невидимый">Невидимый</option>
+            <option value="Парализованный">Парализованный</option>
+            <option value="Окаменевший">Окаменевший</option>
+            <option value="Отравленный">Отравленный</option>
+            <option value="Сбитый с ног">Сбитый с ног</option>
+            <option value="Истощенный">Истощенный</option>
+            <option value="Опутанный">Опутанный</option>
+            <option value="Ошеломлённый">Ошеломлённый</option>
+            <option value="Без сознания">Без сознания</option>
+          </select>
+        </div>
+      </label>
+      <label>Сопротивление урону:
+        <div class="select-container">
+          <div id="resistances_display" class="selected-values"></div>
+          <select id="resistances" multiple size="10">
+            <option value="Дробящий">Дробящий</option>
+            <option value="Рубящий">Рубящий</option>
+            <option value="Колющий">Колющий</option>
+            <option value="Огонь">Огонь</option>
+            <option value="Холод">Холод</option>
+            <option value="Электричество">Электричество</option>
+            <option value="Кислота">Кислота</option>
+            <option value="Яд">Яд</option>
+            <option value="Силовое поле">Силовое поле</option>
+            <option value="Звук">Звук</option>
+            <option value="Некротический">Некротический</option>
+            <option value="Излучение">Излучение</option>
+            <option value="Психическое">Психический</option>
+            <option value="Дробящий от маг. атак">Дробящий от маг. атак</option>
+            <option value="Рубящий от маг. атак">Рубящий от маг. атак</option>
+            <option value="Колющий от маг. атак">Колющий от маг. атак</option>
+          </select>
+        </div>
+      </label>
+      <label>Уязвимость к урону:
+        <div class="select-container">
+          <div id="vulnerabilities_display" class="selected-values"></div>
+          <select id="vulnerabilities" multiple size="10">
+            <option value="Дробящий">Дробящий</option>
+            <option value="Рубящий">Рубящий</option>
+            <option value="Колющий">Колющий</option>
+            <option value="Огонь">Огонь</option>
+            <option value="Холод">Холод</option>
+            <option value="Электричество">Электричество</option>
+            <option value="Кислота">Кислота</option>
+            <option value="Яд">Яд</option>
+            <option value="Силовое поле">Силовое поле</option>
+            <option value="Звук">Звук</option>
+            <option value="Некротический">Некротический</option>
+            <option value="Излучение">Излучение</option>
+            <option value="Психический">Психический</option>
+            <option value="Дробящий от маг. атак">Дробящий от маг. атак</option>
+            <option value="Рубящий от маг. атак">Рубящий от маг. атак</option>
+            <option value="Колющий от маг. атак">Колющий от маг. атак</option>
+          </select>
+        </div>
+      </label>
+      <label>Чувства:
+        <div class="row-compact" style="gap:10px; margin-bottom:5px;">
+          <select id="sense_type" style="width:140px;">
+            <option value="Тёмное зрение">Тёмное зрение</option>
+            <option value="Слепое зрение">Слепое зрение</option>
+            <option value="Истинное зрение">Истинное зрение</option>
+            <option value="Чувство вибрации">Чувство вибрации</option>
+          </select>
+          <input type="number" id="sense_range" placeholder="Радиус (фт)" style="width:100px;">
+          <button type="button" onclick="addSense()" style="padding:0 10px;">+</button>
+        </div>
+        <input type="text" id="senses" placeholder="Выбранные чувства появятся здесь">
+      </label>
+      <label>Языки:
+        <input type="text" id="languages">
+      </label>
+      <div class="row-compact" style="justify-content: flex-start; gap: 40px;">
+        <label style="flex: 0 1 auto;">Уровень опасности (CR):
+          <select id="cr" style="width: 80px;">
+            <option value="0">0</option>
+            <option value="1/8">1/8</option>
+            <option value="1/4">1/4</option>
+            <option value="1/2">1/2</option>
+            <script>
+              for(let i=1; i<=30; i++) document.write(`<option value="${i}">${i}</option>`);
+            </script>
+          </select>
+        </label>
+        <label style="flex: 0 1 auto;">Бонус мастерства:
+          <input type="number" id="proficiency_bonus" value="2" min="2" style="width: 60px;">
+        </label>
+      </div>
+      <label>Особые свойства:
+        <textarea id="traits"></textarea>
+      </label>
+      <label>Действия:
+        <textarea id="actions"></textarea>
+      </label>
+      <label>Описание:
+        <textarea id="description"></textarea>
+      </label>
+      <div id="image-section" style="margin: 15px 0;">
+        <label>Изображение существа:</label>
+        <input type="file" id="monster-image" accept="image/*" style="display:none;">
+        <button type="button" id="image-upload-btn">Загрузить изображение</button>
+        <button type="button" id="image-delete-btn" style="display:none;">Удалить изображение</button>
+        <div id="image-preview" style="margin-top:10px;"></div>
+        <input type="hidden" id="image">
+      </div>
+      <label>Автор:
+        <input type="text" id="author">
+      </label>
+      <button type="button" id="create-btn">Создать</button>
+      <button type="button" id="update-btn">Обновить</button>
+      <button type="button" id="save-btn">Сохранить</button>
+    </form>
+    <div class="small-text" id="author-output"></div>
+  </div>
+  <script src="scripts.js"></script>
+</body>
+</html>
